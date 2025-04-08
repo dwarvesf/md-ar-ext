@@ -249,139 +249,90 @@ async function manageCustomTags(): Promise<void> {
 export async function showSettingsUI(): Promise<void> {
   const settings = [
     {
-      label: 'WebP Quality',
+      label: '⚙️ WebP Quality',
       description: `Current: ${getWebpQuality()}`,
-      detail: 'Set the quality level for WebP conversion (50-100)',
-      id: 'webpQuality'
+      detail: 'Configure quality level for WebP conversion (higher = better quality but larger file)'
     },
     {
-      label: 'Maximum Image Width',
-      description: `Current: ${getMaxDimensions().width}px`,
-      detail: 'Set the maximum width before resizing images',
-      id: 'maxWidth'
+      label: '📐 Max Dimensions',
+      description: `Current: ${getMaxDimensions().width}×${getMaxDimensions().height}`,
+      detail: 'Set maximum dimensions for image resizing'
     },
     {
-      label: 'Maximum Image Height',
-      description: `Current: ${getMaxDimensions().height}px`,
-      detail: 'Set the maximum height before resizing images',
-      id: 'maxHeight'
-    },
-    {
-      label: 'Enable Metadata Tags',
+      label: '🏷️ Metadata Tags',
       description: `Current: ${getMetadataTagsEnabled() ? 'Enabled' : 'Disabled'}`,
-      detail: 'Add additional metadata tags to Arweave uploads',
-      id: 'enableMetadataTags'
+      detail: 'Enable or disable adding metadata tags to uploads'
     },
     {
-      label: 'Show Upload Progress',
-      description: `Current: ${getSetting('showUploadProgress', DEFAULT_SETTINGS.showUploadProgress) ? 'Enabled' : 'Disabled'}`,
-      detail: 'Show detailed progress information during uploads',
-      id: 'showUploadProgress'
+      label: '🏷️ Custom Tags',
+      description: 'Configure custom tags for uploads',
+      detail: 'Add or remove custom tags for Arweave uploads'
     },
     {
-      label: 'Check Balance Before Upload',
-      description: `Current: ${getSetting('checkBalanceBeforeUpload', DEFAULT_SETTINGS.checkBalanceBeforeUpload) ? 'Enabled' : 'Disabled'}`,
-      detail: 'Check if wallet has sufficient balance before uploading',
-      id: 'checkBalanceBeforeUpload'
+      label: '📤 Export Settings',
+      description: 'Save current settings to a file',
+      detail: 'Export all extension settings to a JSON file'
     },
     {
-      label: 'Manage Custom Tags',
-      description: `${getCustomTags().length} tags configured`,
-      detail: 'Add or remove custom tags for Arweave uploads',
-      id: 'customTags'
-    },
-    {
-      label: 'Open Settings in Editor',
-      description: 'Edit all settings in settings.json',
-      detail: 'Use the VS Code settings editor to modify all extension settings',
-      id: 'openSettingsJson'
+      label: '📥 Import Settings',
+      description: 'Load settings from a file',
+      detail: 'Import extension settings from a JSON file'
     }
   ];
-
+  
   const selection = await vscode.window.showQuickPick(settings, {
-    title: 'md-ar-ext Settings',
     placeHolder: 'Select a setting to configure'
   });
-
+  
   if (!selection) {
     return;
   }
-
-  switch (selection.id) {
-    case 'webpQuality':
-      await showNumericQuickPick(
-        'webpQuality', 
-        ['50', '60', '70', '80', '90', '95', '100'],
-        'WebP Quality',
-        'Select quality level (higher = better quality but larger files)'
-      );
-      break;
+  
+  if (selection.label.includes('WebP Quality')) {
+    const options = ['70', '80', '90', '95', '100'];
+    await showNumericQuickPick(
+      'webpQuality',
+      options,
+      'Select WebP Quality',
+      `Current: ${getWebpQuality()}`
+    );
+  } 
+  else if (selection.label.includes('Max Dimensions')) {
+    const dimensionOptions = [
+      { label: 'Width', key: 'maxWidth', currentValue: getMaxDimensions().width },
+      { label: 'Height', key: 'maxHeight', currentValue: getMaxDimensions().height }
+    ];
     
-    case 'maxWidth':
-      await showDimensionInput(
-        'maxWidth',
-        'Maximum Image Width',
-        getMaxDimensions().width
-      );
-      break;
+    const dimensionSelection = await vscode.window.showQuickPick(
+      dimensionOptions.map(opt => ({
+        label: opt.label,
+        description: `Current: ${opt.currentValue}px`
+      })),
+      { title: 'Select dimension to change' }
+    );
     
-    case 'maxHeight':
-      await showDimensionInput(
-        'maxHeight',
-        'Maximum Image Height',
-        getMaxDimensions().height
-      );
-      break;
-    
-    case 'enableMetadataTags':
-      const enableMetadata = await vscode.window.showQuickPick(
-        ['Enable', 'Disable'],
-        {
-          title: 'Metadata Tagging',
-          placeHolder: 'Add metadata tags to Arweave uploads?'
-        }
-      );
-      
-      if (enableMetadata) {
-        await updateSetting('enableMetadataTags', enableMetadata === 'Enable');
+    if (dimensionSelection) {
+      const option = dimensionOptions.find(opt => opt.label === dimensionSelection.label);
+      if (option) {
+        await showDimensionInput(option.key, `Set maximum ${option.label.toLowerCase()}`, option.currentValue);
       }
-      break;
+    }
+  } 
+  else if (selection.label.includes('Metadata Tags')) {
+    const enabled = getMetadataTagsEnabled();
+    const newValue = !enabled;
     
-    case 'showUploadProgress':
-      const showProgress = await vscode.window.showQuickPick(
-        ['Enable', 'Disable'],
-        {
-          title: 'Upload Progress',
-          placeHolder: 'Show detailed progress during uploads?'
-        }
-      );
-      
-      if (showProgress) {
-        await updateSetting('showUploadProgress', showProgress === 'Enable');
-      }
-      break;
-    
-    case 'checkBalanceBeforeUpload':
-      const checkBalance = await vscode.window.showQuickPick(
-        ['Enable', 'Disable'],
-        {
-          title: 'Balance Check',
-          placeHolder: 'Check wallet balance before uploading?'
-        }
-      );
-      
-      if (checkBalance) {
-        await updateSetting('checkBalanceBeforeUpload', checkBalance === 'Enable');
-      }
-      break;
-    
-    case 'customTags':
-      await manageCustomTags();
-      break;
-    
-    case 'openSettingsJson':
-      await openSettings();
-      break;
+    await updateSetting('enableMetadataTags', newValue);
+    vscode.window.showInformationMessage(`Metadata tags ${newValue ? 'enabled' : 'disabled'}`);
+  } 
+  else if (selection.label.includes('Custom Tags')) {
+    await manageCustomTags();
+  }
+  else if (selection.label.includes('Export Settings')) {
+    await exportSettings();
+  }
+  else if (selection.label.includes('Import Settings')) {
+    await importSettings();
   }
 }
 
@@ -438,4 +389,93 @@ export async function quickConfigureSettings(): Promise<void> {
   }
 
   vscode.window.showInformationMessage('Settings updated successfully.');
+}
+
+/**
+ * Exports all extension settings to a JSON file
+ */
+export async function exportSettings(): Promise<void> {
+  const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+  
+  // Get all settings
+  const settings: Record<string, any> = {};
+  const allSettings = DEFAULT_SETTINGS as Record<string, any>;
+  
+  // Iterate through all default settings to get their current values
+  for (const key in allSettings) {
+    settings[key] = config.get(key, allSettings[key]);
+  }
+  
+  // Let user select where to save the file
+  const defaultFilename = 'md-ar-ext-settings.json';
+  let defaultUri: vscode.Uri;
+  
+  if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+    defaultUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, defaultFilename);
+  } else {
+    defaultUri = vscode.Uri.file(defaultFilename);
+  }
+  
+  const fileUri = await vscode.window.showSaveDialog({
+    defaultUri,
+    filters: { 'JSON Files': ['json'] },
+    title: 'Export Extension Settings'
+  });
+  
+  if (fileUri) {
+    try {
+      // Format JSON nicely with 2 spaces indentation
+      const content = JSON.stringify(settings, null, 2);
+      
+      // Use VS Code file system API to write file
+      await vscode.workspace.fs.writeFile(fileUri, Buffer.from(content, 'utf-8'));
+      
+      vscode.window.showInformationMessage(`Settings exported to ${fileUri.fsPath}`);
+    } catch (error) {
+      vscode.window.showErrorMessage(`Failed to export settings: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+}
+
+/**
+ * Imports extension settings from a JSON file
+ */
+export async function importSettings(): Promise<void> {
+  // Let user select the file to import
+  const fileUris = await vscode.window.showOpenDialog({
+    canSelectFiles: true,
+    canSelectFolders: false,
+    canSelectMany: false,
+    filters: { 'JSON Files': ['json'] },
+    title: 'Import Extension Settings'
+  });
+  
+  if (!fileUris || fileUris.length === 0) {
+    return;
+  }
+  
+  try {
+    // Read the file content
+    const content = await vscode.workspace.fs.readFile(fileUris[0]);
+    const settingsJson = Buffer.from(content).toString('utf-8');
+    
+    // Parse the JSON
+    const importedSettings = JSON.parse(settingsJson);
+    
+    // Validate the settings structure
+    if (typeof importedSettings !== 'object' || importedSettings === null) {
+      throw new Error('Invalid settings file format');
+    }
+    
+    // Apply all settings
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    
+    for (const [key, value] of Object.entries(importedSettings)) {
+      await config.update(key, value, vscode.ConfigurationTarget.Global);
+    }
+    
+    vscode.window.showInformationMessage('Settings imported successfully');
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to import settings: ${error instanceof Error ? error.message : String(error)}`);
+  }
 } 

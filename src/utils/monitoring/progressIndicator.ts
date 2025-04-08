@@ -78,7 +78,7 @@ export function createProgressHandler(steps: number) {
  * @returns Object with methods to update progress with time estimates
  */
 export function createTimeEstimateProgressHandler(totalSize: number) {
-  let startTime = Date.now();
+  const startTime = Date.now();
   let lastUpdate = startTime;
   let processedSize = 0;
   
