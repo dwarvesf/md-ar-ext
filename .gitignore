@@ -1,0 +1,39 @@
+# Dependency directories
+node_modules/
+dist/
+out/
+
+# Build files
+*.vsix
+
+# Environment and configuration files
+.env
+.vscode-test/
+.vscode/
+*.private.json
+*.private.key
+arweave-key.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Test files and coverage reports
+coverage/
+.nyc_output/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache 

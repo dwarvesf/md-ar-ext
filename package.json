@@ -1,0 +1,155 @@
+{
+  "name": "md-ar-ext",
+  "displayName": "md-ar-ext",
+  "description": "A VS Code extension to upload resized WebP images to Arweave and insert Markdown links",
+  "version": "0.1.0",
+  "publisher": "yourusername",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onCommand:md-ar-ext.updatePrivateKey",
+    "onCommand:md-ar-ext.deletePrivateKey",
+    "onCommand:md-ar-ext.pasteAndInsert"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "md-ar-ext.updatePrivateKey",
+        "title": "md-ar-ext: Update Arweave Private Key"
+      },
+      {
+        "command": "md-ar-ext.deletePrivateKey",
+        "title": "md-ar-ext: Delete Arweave Private Key"
+      },
+      {
+        "command": "md-ar-ext.pasteAndInsert",
+        "title": "md-ar-ext: Paste and Insert Image"
+      },
+      {
+        "command": "md-ar-ext.checkBalance",
+        "title": "md-ar-ext: Check Arweave Wallet Balance"
+      },
+      {
+        "command": "md-ar-ext.viewStatistics",
+        "title": "md-ar-ext: View Upload Statistics"
+      },
+      {
+        "command": "md-ar-ext.configureSettings",
+        "title": "md-ar-ext: Quick Configure Settings"
+      },
+      {
+        "command": "md-ar-ext.showWalletAddress",
+        "title": "md-ar-ext: Show Arweave Wallet Address"
+      },
+      {
+        "command": "md-ar-ext.importKeyFromFile",
+        "title": "md-ar-ext: Import Arweave Key from File"
+      },
+      {
+        "command": "md-ar-ext.exportStats",
+        "title": "md-ar-ext: Export Upload Statistics"
+      },
+      {
+        "command": "md-ar-ext.showSettingsUI",
+        "title": "md-ar-ext: Settings"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "md-ar-ext.handlePaste",
+        "key": "ctrl+v",
+        "mac": "cmd+v",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorLangId == markdown",
+          "command": "md-ar-ext.pasteAndInsert",
+          "group": "md-ar-ext"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "md-ar-ext.pasteAndInsert",
+          "when": "editorLangId == markdown"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "md-ar-ext",
+      "properties": {
+        "md-ar-ext.webpQuality": {
+          "type": "number",
+          "default": 90,
+          "minimum": 50,
+          "maximum": 100,
+          "description": "WebP image quality (50-100)"
+        },
+        "md-ar-ext.maxWidth": {
+          "type": "number",
+          "default": 1876,
+          "description": "Maximum image width before resizing"
+        },
+        "md-ar-ext.maxHeight": {
+          "type": "number",
+          "default": 1251,
+          "description": "Maximum image height before resizing"
+        },
+        "md-ar-ext.enableMetadataTags": {
+          "type": "boolean",
+          "default": false,
+          "description": "Add additional metadata tags to Arweave uploads"
+        },
+        "md-ar-ext.customTags": {
+          "type": "array",
+          "default": [],
+          "description": "Custom Arweave tags to add to uploads (format: 'key:value')"
+        },
+        "md-ar-ext.showUploadProgress": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show detailed upload progress with time estimates"
+        },
+        "md-ar-ext.checkBalanceBeforeUpload": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check wallet balance before attempting uploads"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/imagemagick": "^0.0.34",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^18.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.52.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "arweave": "^1.15.1",
+    "imagemagick": "^0.1.3"
+  }
+}
