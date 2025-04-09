@@ -19,7 +19,10 @@ const config = {
   externals: {
     // These modules are pre-provided by VS Code
     // and don't need to be included in our bundle
-    vscode: 'commonjs vscode'
+    vscode: 'commonjs vscode',
+    // Add other modules that shouldn't be bundled
+    // For example, if using native modules:
+    // 'some-native-module': 'commonjs some-native-module'
   },
   resolve: {
     extensions: ['.ts', '.js']
