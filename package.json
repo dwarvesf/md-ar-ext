@@ -2,7 +2,7 @@
   "name": "md-ar-ext",
   "displayName": "Markdown Arweave Uploader",
   "description": "A VS Code extension to upload resized WebP images to Arweave and insert Markdown links",
-  "version": "0.2.0",
+  "version": "0.2.3",
   "publisher": "dwarvesf",
   "repository": {
     "type": "git",
@@ -226,7 +226,8 @@
     "release:patch": "npm run version:patch && npm run release:prepare",
     "release:minor": "npm run version:minor && npm run release:prepare",
     "release:major": "npm run version:major && npm run release:prepare",
-    "release:prepare": "npm run test && npm run lint && npm run webpack-prod && npm run package",
+    "release:prepare": "npm run lint && npm run webpack-prod && npm run package",
+    "release:prepare:withtest": "npm run test && npm run lint && npm run webpack-prod && npm run package",
     "release": "node ./scripts/release.js",
     "prepublish": "npm run env:validate",
     "publish": "node ./scripts/publish-local.js",

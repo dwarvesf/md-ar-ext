@@ -134,7 +134,7 @@ suite('NetworkService Tests', () => {
       assert.fail('Expected an error to be thrown');
     } catch (error) {
       assert.ok(error instanceof ExtensionError);
-      assert.strictEqual((error as ExtensionError).type, ErrorType.NETWORK_RESPONSE);
+      assert.strictEqual((error as ExtensionError).type, ErrorType.networkResponse);
       assert.ok((error as ExtensionError).message.includes('404'));
       assert.strictEqual((error as ExtensionError).details.status, 404);
     }
@@ -196,7 +196,7 @@ suite('NetworkService Tests', () => {
       assert.fail('Expected an error to be thrown');
     } catch (error) {
       assert.ok(error instanceof ExtensionError);
-      assert.strictEqual((error as ExtensionError).type, ErrorType.NETWORK_REQUEST);
+      assert.strictEqual((error as ExtensionError).type, ErrorType.networkRequest);
       assert.ok((error as ExtensionError).message.includes('failed after 3 attempts'));
     }
     

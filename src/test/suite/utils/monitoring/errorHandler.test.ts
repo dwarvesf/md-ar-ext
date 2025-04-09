@@ -6,7 +6,7 @@ suite('ErrorHandler Tests', () => {
   
   test('ExtensionError should have correct properties', () => {
     const message = 'Test error message';
-    const type = ErrorType.VALIDATION;
+    const type = ErrorType.validation;
     const details = { field: 'test', value: 'invalid' };
     
     const error = new ExtensionError(message, type, details);
@@ -20,7 +20,7 @@ suite('ErrorHandler Tests', () => {
   
   test('ExtensionError should have actionable properties when specified', () => {
     const message = 'Test actionable error';
-    const type = ErrorType.DEPENDENCY;
+    const type = ErrorType.dependency;
     const actionText = 'Fix It';
     const actionCallback = async () => { /* do nothing */ };
     
@@ -39,7 +39,7 @@ suite('ErrorHandler Tests', () => {
     
     const error = createDependencyError(dependencyName, installationGuide);
     
-    assert.strictEqual(error.type, ErrorType.DEPENDENCY);
+    assert.strictEqual(error.type, ErrorType.dependency);
     assert.strictEqual(error.actionable, true);
     assert.strictEqual(error.actionText, 'Show Installation Guide');
     assert.ok(error.message.includes(dependencyName));
@@ -53,7 +53,7 @@ suite('ErrorHandler Tests', () => {
     
     const error = createNetworkError(message, details, retryCallback);
     
-    assert.strictEqual(error.type, ErrorType.NETWORK_REQUEST);
+    assert.strictEqual(error.type, ErrorType.networkRequest);
     assert.strictEqual(error.message, message);
     assert.deepStrictEqual(error.details, details);
     assert.strictEqual(error.actionable, true);
@@ -67,7 +67,7 @@ suite('ErrorHandler Tests', () => {
     
     const error = createNetworkError(message, details);
     
-    assert.strictEqual(error.type, ErrorType.NETWORK_REQUEST);
+    assert.strictEqual(error.type, ErrorType.networkRequest);
     assert.strictEqual(error.message, message);
     assert.strictEqual(error.actionable, false);
   });
@@ -81,7 +81,7 @@ suite('ErrorHandler Tests', () => {
   
   test('ExtensionError devMessage should include type and details', () => {
     const message = 'Test error dev message';
-    const type = ErrorType.ARWEAVE_WALLET;
+    const type = ErrorType.arweaveWallet;
     const details = { walletId: '123' };
     
     const error = new ExtensionError(message, type, details);

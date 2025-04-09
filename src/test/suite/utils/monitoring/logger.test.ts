@@ -27,7 +27,7 @@ suite('Logger Tests', () => {
     consoleDebugStub = sinon.stub(console, 'debug');
     
     // Create a new logger instance for each test
-    loggerInstance = Logger['instance'] = new (Logger as any)('TEST-LOGGER');
+    loggerInstance = Logger['_instance'] = new (Logger as any)('TEST-LOGGER');
   });
   
   teardown(() => {
@@ -35,7 +35,7 @@ suite('Logger Tests', () => {
     sinon.restore();
     
     // Reset the singleton instance
-    Logger['instance'] = undefined as any;
+    Logger['_instance'] = undefined as any;
   });
   
   test('getInstance should return the same instance', () => {
@@ -47,7 +47,7 @@ suite('Logger Tests', () => {
   
   test('getInstance should create a new instance with default name if not exists', () => {
     // Reset the singleton instance
-    Logger['instance'] = undefined as any;
+    Logger['_instance'] = undefined as any;
     
     
     assert.strictEqual(createOutputChannelStub.calledOnce, true);
@@ -56,7 +56,7 @@ suite('Logger Tests', () => {
   
   test('getInstance should create a new instance with custom name if specified', () => {
     // Reset the singleton instance
-    Logger['instance'] = undefined as any;
+    Logger['_instance'] = undefined as any;
     
     const customName = 'CUSTOM-LOGGER';
     
@@ -65,15 +65,15 @@ suite('Logger Tests', () => {
   });
   
   test('logLevel getter and setter should work correctly', () => {
-    loggerInstance.logLevel = LogLevel.DEBUG;
-    assert.strictEqual(loggerInstance.logLevel, LogLevel.DEBUG);
+    loggerInstance.logLevel = LogLevel.debug;
+    assert.strictEqual(loggerInstance.logLevel, LogLevel.debug);
     
-    loggerInstance.logLevel = LogLevel.ERROR;
-    assert.strictEqual(loggerInstance.logLevel, LogLevel.ERROR);
+    loggerInstance.logLevel = LogLevel.error;
+    assert.strictEqual(loggerInstance.logLevel, LogLevel.error);
   });
   
   test('debug should log messages when level is DEBUG', () => {
-    loggerInstance.logLevel = LogLevel.DEBUG;
+    loggerInstance.logLevel = LogLevel.debug;
     
     const message = 'Debug message';
     const category = 'TEST';
@@ -89,7 +89,7 @@ suite('Logger Tests', () => {
   });
   
   test('debug should not log messages when level is higher than DEBUG', () => {
-    loggerInstance.logLevel = LogLevel.INFO;
+    loggerInstance.logLevel = LogLevel.info;
     
     loggerInstance.debug('Debug message');
     
@@ -98,7 +98,7 @@ suite('Logger Tests', () => {
   });
   
   test('info should log messages when level is INFO or lower', () => {
-    loggerInstance.logLevel = LogLevel.INFO;
+    loggerInstance.logLevel = LogLevel.info;
     
     const message = 'Info message';
     
@@ -112,7 +112,7 @@ suite('Logger Tests', () => {
   });
   
   test('warn should log messages when level is WARN or lower', () => {
-    loggerInstance.logLevel = LogLevel.WARN;
+    loggerInstance.logLevel = LogLevel.warn;
     
     const message = 'Warning message';
     
@@ -126,7 +126,7 @@ suite('Logger Tests', () => {
   });
   
   test('error should log messages when level is ERROR or lower', () => {
-    loggerInstance.logLevel = LogLevel.ERROR;
+    loggerInstance.logLevel = LogLevel.error;
     
     const message = 'Error message';
     const error = new Error('Test error');

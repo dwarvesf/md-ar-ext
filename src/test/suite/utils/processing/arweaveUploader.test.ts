@@ -51,9 +51,9 @@ suite('ArweaveUploader Test Suite', () => {
     const mockWinstonBalance = '1000000000000';
     const mockArBalance = '1.000000000000';
     
-    sandbox.stub(arweaveUploader.arweave.wallets, 'getAddress').withArgs(sinon.match(mockWallet)).resolves(mockAddress);
-    sandbox.stub(arweaveUploader.arweave.wallets, 'getBalance').withArgs(mockAddress).resolves(mockWinstonBalance);
-    sandbox.stub(arweaveUploader.arweave.ar, 'winstonToAr').withArgs(mockWinstonBalance).returns(mockArBalance);
+    sandbox.stub(arweaveUploader.arweaveClient.wallets, 'getAddress').withArgs(sinon.match(mockWallet)).resolves(mockAddress);
+    sandbox.stub(arweaveUploader.arweaveClient.wallets, 'getBalance').withArgs(mockAddress).resolves(mockWinstonBalance);
+    sandbox.stub(arweaveUploader.arweaveClient.ar, 'winstonToAr').withArgs(mockWinstonBalance).returns(mockArBalance);
     
     const balance = await arweaveUploader.checkWalletBalance(mockWallet);
     
@@ -63,13 +63,13 @@ suite('ArweaveUploader Test Suite', () => {
   test('checkWalletBalance should throw ExtensionError on failure', async () => {
     // Mock arweave client methods to simulate error
     const mockWallet = { test: 'wallet' };
-    sandbox.stub(arweaveUploader.arweave.wallets, 'getAddress').rejects(new Error('Connection failed'));
+    sandbox.stub(arweaveUploader.arweaveClient.wallets, 'getAddress').rejects(new Error('Connection failed'));
     
     await assert.rejects(
       async () => await arweaveUploader.checkWalletBalance(mockWallet),
       (error: ExtensionError) => {
         assert.ok(error instanceof ExtensionError);
-        assert.strictEqual(error.type, ErrorType.ARWEAVE_WALLET);
+        assert.strictEqual(error.type, ErrorType.arweaveWallet);
         assert.ok(error.message.includes('Failed to check wallet balance'));
         return true;
       }
@@ -81,7 +81,7 @@ suite('ArweaveUploader Test Suite', () => {
     const mockWallet = { test: 'wallet' };
     const mockAddress = 'mock-wallet-address';
     
-    sandbox.stub(arweaveUploader.arweave.wallets, 'getAddress').withArgs(sinon.match(mockWallet)).resolves(mockAddress);
+    sandbox.stub(arweaveUploader.arweaveClient.wallets, 'getAddress').withArgs(sinon.match(mockWallet)).resolves(mockAddress);
     
     const address = await arweaveUploader.getWalletAddress(mockWallet);
     
@@ -94,8 +94,8 @@ suite('ArweaveUploader Test Suite', () => {
     const winstonPrice = '1000000000';
     const arPrice = '0.000001000';
     
-    sandbox.stub(arweaveUploader.arweave.transactions, 'getPrice').withArgs(fileSizeBytes).resolves(winstonPrice);
-    sandbox.stub(arweaveUploader.arweave.ar, 'winstonToAr').withArgs(winstonPrice).returns(arPrice);
+    sandbox.stub(arweaveUploader.arweaveClient.transactions, 'getPrice').withArgs(fileSizeBytes).resolves(winstonPrice);
+    sandbox.stub(arweaveUploader.arweaveClient.ar, 'winstonToAr').withArgs(winstonPrice).returns(arPrice);
     
     // Mock exchange rate
     sandbox.stub(arweaveUploader, 'getArToUsdRate').resolves(10.5);
@@ -110,7 +110,7 @@ suite('ArweaveUploader Test Suite', () => {
     // Mock arweave client methods to simulate error
     const fileSizeBytes = 1024 * 1024 * 100; // 100MB
     
-    sandbox.stub(arweaveUploader.arweave.transactions, 'getPrice').rejects(new Error('API error'));
+    sandbox.stub(arweaveUploader.arweaveClient.transactions, 'getPrice').rejects(new Error('API error'));
     sandbox.stub(arweaveUploader, 'getArToUsdRate').resolves(null);
     
     const cost = await arweaveUploader.estimateUploadCost(fileSizeBytes);
@@ -225,7 +225,7 @@ suite('ArweaveUploader Test Suite', () => {
       async () => await arweaveUploader.verifyTransaction('test-tx-id'),
       (error: ExtensionError) => {
         assert.ok(error instanceof ExtensionError);
-        assert.strictEqual(error.type, ErrorType.NETWORK_REQUEST);
+        assert.strictEqual(error.type, ErrorType.networkRequest);
         assert.ok(error.message.includes('Failed to verify transaction'));
         return true;
       }

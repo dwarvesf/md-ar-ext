@@ -24,7 +24,7 @@ const rl = readline.createInterface({
 });
 
 // Helper to prompt user
-function prompt(question) {
+function promptUser(question) {
   return new Promise((resolve) => {
     rl.question(question, (answer) => {
       resolve(answer.trim());
@@ -98,7 +98,7 @@ async function main() {
   
   if (envExists) {
     console.log('An .env file already exists in your project root.');
-    const answer = await prompt('Do you want to update it? (y/n): ');
+    const answer = await promptUser('Do you want to update it? (y/n): ');
     if (answer.toLowerCase() !== 'y') {
       console.log('Setup cancelled. Existing .env file not modified.');
       rl.close();
@@ -161,11 +161,11 @@ async function main() {
       console.log(comments[variable]);
     }
     
-    const prompt = isOptional
+    const promptText = isOptional
       ? `${variable} (optional) [${currentValue}]: `
       : `${variable} [${currentValue}]: `;
     
-    const value = await prompt(prompt);
+    const value = await promptUser(promptText);
     
     // Update variable in content
     if (value || currentValue) {

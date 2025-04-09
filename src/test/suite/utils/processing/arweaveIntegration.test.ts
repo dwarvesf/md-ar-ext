@@ -125,7 +125,7 @@ suite('ArweaveUploader and NetworkService Integration Tests', () => {
       assert.fail('Expected an error to be thrown');
     } catch (error) {
       assert.ok(error instanceof ExtensionError);
-      assert.strictEqual((error as ExtensionError).type, ErrorType.NETWORK_REQUEST);
+      assert.strictEqual((error as ExtensionError).type, ErrorType.networkRequest);
       assert.ok((error as ExtensionError).message.includes('Failed to verify transaction'));
     }
   });

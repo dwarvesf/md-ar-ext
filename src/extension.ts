@@ -72,7 +72,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     
     // Set appropriate log level based on mode
     if (extensionState.debugMode) {
-      logger.logLevel = LogLevel.DEBUG;
+      logger.logLevel = LogLevel.debug;
       logger.debug('Debug mode enabled', 'EXTENSION');
     }
     
@@ -128,7 +128,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       if (!installed) {
         const error = new ExtensionError(
           'ImageMagick is required but does not appear to be installed.',
-          ErrorType.DEPENDENCY,
+          ErrorType.dependency,
           undefined,
           true,
           'Show Installation Instructions',

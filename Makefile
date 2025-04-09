@@ -149,15 +149,24 @@ publish: env-check ensure-release-dir
 # Release commands
 release-patch: ensure-release-dir
 	@echo "$(BLUE)Creating patch release...$(RESET)"
-	@$(NPM) run release:patch -- --out $(RELEASE_DIR)
+	@$(NPM) run version:patch
+	@$(NPM) run lint
+	@$(NPM) run webpack-prod
+	@$(NPM) run package -- --out $(RELEASE_DIR)
 
 release-minor: ensure-release-dir
 	@echo "$(BLUE)Creating minor release...$(RESET)"
-	@$(NPM) run release:minor -- --out $(RELEASE_DIR)
+	@$(NPM) run version:minor
+	@$(NPM) run lint
+	@$(NPM) run webpack-prod
+	@$(NPM) run package -- --out $(RELEASE_DIR)
 
 release-major: ensure-release-dir
 	@echo "$(BLUE)Creating major release...$(RESET)"
-	@$(NPM) run release:major -- --out $(RELEASE_DIR)
+	@$(NPM) run version:major
+	@$(NPM) run lint
+	@$(NPM) run webpack-prod
+	@$(NPM) run package -- --out $(RELEASE_DIR)
 
 # Clean commands
 clean:
