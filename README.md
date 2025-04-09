@@ -82,7 +82,7 @@ The interactive setup will:
 | `make env-setup` | Configure environment variables |
 | `make dev` | Start development server with watch mode |
 | `make test` | Run tests |
-| `make package` | Create VSIX package |
+| `make package` | Create VSIX package in `releases` directory |
 | `make publish` | Publish to VS Code Marketplace |
 | `make clean` | Clean build artifacts |
 
@@ -191,6 +191,9 @@ The release process automatically:
 2. Updates CHANGELOG.md
 3. Builds and packages the extension
 4. Creates git commit and tag
+5. Outputs packaged extension to the `releases` directory
+
+All packages and release artifacts are stored in the `releases` directory, keeping your project root clean.
 
 ### CI/CD Pipeline
 

@@ -5,8 +5,8 @@ import * as path from 'path';
  * WebView panel types
  */
 export enum WebViewType {
-  Settings = 'md-ar-ext.settingsView',
-  Statistics = 'md-ar-ext.statisticsView'
+  settings = 'md-ar-ext.settingsView',
+  statistics = 'md-ar-ext.statisticsView'
 }
 
 /**

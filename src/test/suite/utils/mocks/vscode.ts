@@ -133,7 +133,7 @@ export const mockVSCode = {
   },
   
   // Secret storage
-  SecretStorage: class {
+  secretStorage: class {
     private _store: Map<string, string> = new Map();
     
     get(key: string): Thenable<string | undefined> {
@@ -152,14 +152,14 @@ export const mockVSCode = {
   },
   
   // URI and positions
-  Uri: {
+  uri: {
     file: (path: string) => ({ fsPath: path, scheme: 'file' }),
     parse: (uri: string) => ({ fsPath: uri, scheme: uri.split(':')[0] })
   },
-  Position: class {
+  position: class {
     constructor(public line: number, public character: number) {}
   },
-  Range: class {
+  range: class {
     constructor(
       public start: { line: number, character: number }, 
       public end: { line: number, character: number }

@@ -82,7 +82,7 @@ async function main(): Promise<void> {
       throw new Error('Failed to get a valid VS Code executable path');
     }
     
-    const [cliPath, ...args] = resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
+    const [, ...args] = resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
 
     // Add additional CLI options for better test output
     args.push('--verbose');
@@ -111,7 +111,7 @@ async function main(): Promise<void> {
       // Add extra environment variables for testing
       extensionTestsEnv: {
         ...process.env,
-        TEST_MODE: 'true'
+        testMode: 'true'
       }
     });
 

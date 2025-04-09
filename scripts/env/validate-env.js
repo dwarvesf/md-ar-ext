@@ -10,6 +10,12 @@
 const fs = require('fs');
 const path = require('path');
 
+// Skip validation in CI environments
+if (process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true') {
+  console.log('Running in CI environment - skipping environment validation');
+  process.exit(0);
+}
+
 // Configuration
 const ROOT_DIR = path.join(__dirname, '../..');
 const ENV_PATH = path.join(ROOT_DIR, '.env');

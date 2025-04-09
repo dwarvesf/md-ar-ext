@@ -418,7 +418,7 @@ export async function exportSettings(): Promise<void> {
   
   const fileUri = await vscode.window.showSaveDialog({
     defaultUri,
-    filters: { 'JSON Files': ['json'] },
+    filters: { jsonFiles: ['json'] },
     title: 'Export Extension Settings'
   });
   
@@ -446,7 +446,7 @@ export async function importSettings(): Promise<void> {
     canSelectFiles: true,
     canSelectFolders: false,
     canSelectMany: false,
-    filters: { 'JSON Files': ['json'] },
+    filters: { jsonFiles: ['json'] },
     title: 'Import Extension Settings'
   });
   

@@ -155,8 +155,8 @@ export async function importKeyFromFile(context: vscode.ExtensionContext): Promi
     canSelectFolders: false,
     canSelectMany: false,
     filters: {
-      'JSON Files': ['json'],
-      'All Files': ['*']
+      jsonFiles: ['json'],
+      allFiles: ['*']
     },
     title: 'Select Arweave Keyfile'
   });

@@ -85,7 +85,7 @@ export async function handleUploadImage(context: vscode.ExtensionContext): Promi
   const fileUris = await vscode.window.showOpenDialog({
     canSelectMany: false,
     filters: {
-      'Images': ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif']
+      'images': ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif']
     },
     title: 'Select an image to upload'
   });
@@ -109,7 +109,7 @@ export async function processImageOnly(_context: vscode.ExtensionContext): Promi
   const fileUris = await vscode.window.showOpenDialog({
     canSelectMany: false,
     filters: {
-      'Images': ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif']
+      'images': ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif']
     },
     title: 'Select an image to process'
   });

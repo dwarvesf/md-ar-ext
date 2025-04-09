@@ -1,4 +1,4 @@
-import Arweave from 'arweave';
+import arweave from 'arweave';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { networkService } from '../networking/networkService';
@@ -30,7 +30,7 @@ export interface ArweaveTransactionStatus {
 }
 
 // Initialize Arweave client
-export const arweave = Arweave.init({
+export const arweaveClient = arweave.init({
   host: 'arweave.net',
   port: 443,
   protocol: 'https',
@@ -108,16 +108,16 @@ export async function getArToUsdRate(): Promise<number | null> {
  */
 export async function checkWalletBalance(wallet: any): Promise<string> {
   try {
-    const address = await arweave.wallets.getAddress(wallet);
-    const winstonBalance = await arweave.wallets.getBalance(address);
-    const arBalance = arweave.ar.winstonToAr(winstonBalance);
+    const address = await arweaveClient.wallets.getAddress(wallet);
+    const winstonBalance = await arweaveClient.wallets.getBalance(address);
+    const arBalance = arweaveClient.ar.winstonToAr(winstonBalance);
     logger.debug(`Wallet balance: ${arBalance} AR`, 'ARWEAVE');
     return arBalance;
   } catch (error) {
     logger.error('Failed to check wallet balance', error, 'ARWEAVE');
     throw new ExtensionError(
       'Failed to check wallet balance. Please check your internet connection and try again.',
-      ErrorType.ARWEAVE_WALLET,
+      ErrorType.arweaveWallet,
       error
     );
   }
@@ -130,14 +130,14 @@ export async function checkWalletBalance(wallet: any): Promise<string> {
  */
 export async function getWalletAddress(wallet: any): Promise<string> {
   try {
-    const address = await arweave.wallets.getAddress(wallet);
+    const address = await arweaveClient.wallets.getAddress(wallet);
     logger.debug(`Got wallet address: ${address}`, 'ARWEAVE');
     return address;
   } catch (error) {
     logger.error('Failed to get wallet address', error, 'ARWEAVE');
     throw new ExtensionError(
       'Failed to get wallet address. The key file may be invalid.',
-      ErrorType.ARWEAVE_WALLET,
+      ErrorType.arweaveWallet,
       error
     );
   }
@@ -155,8 +155,8 @@ export async function estimateUploadCost(
   let arCost: string;
   
   try {
-    const price = await arweave.transactions.getPrice(sizeInBytes);
-    arCost = arweave.ar.winstonToAr(price);
+    const price = await arweaveClient.transactions.getPrice(sizeInBytes);
+    arCost = arweaveClient.ar.winstonToAr(price);
     logger.debug(`Estimated cost for ${formatFileSize(sizeInBytes)}: ${arCost} AR`, 'ARWEAVE');
   } catch (error) {
     // Fallback to approximation if API call fails
@@ -208,7 +208,7 @@ export async function checkBalanceSufficient(
     logger.error('Failed to check if balance is sufficient', error, 'ARWEAVE');
     throw new ExtensionError(
       'Failed to check wallet balance. Please try again later.',
-      ErrorType.ARWEAVE_BALANCE,
+      ErrorType.arweaveWallet,
       error
     );
   }
@@ -306,7 +306,7 @@ export async function uploadToArweave(
       throw new Error('Operation cancelled by user');
     }
     
-    const transaction = await arweave.createTransaction({ data }, wallet);
+    const transaction = await arweaveClient.createTransaction({ data }, wallet);
     
     // Add standard content type tag
     transaction.addTag('Content-Type', 'image/webp');
@@ -335,7 +335,7 @@ export async function uploadToArweave(
       throw new Error('Operation cancelled by user');
     }
     
-    await arweave.transactions.sign(transaction, wallet);
+    await arweaveClient.transactions.sign(transaction, wallet);
     
     // Post transaction
     if (progress) {
@@ -347,7 +347,7 @@ export async function uploadToArweave(
       throw new Error('Operation cancelled by user');
     }
     
-    const response = await arweave.transactions.post(transaction);
+    const response = await arweaveClient.transactions.post(transaction);
     
     if (response.status !== 200 && response.status !== 202) {
       throw new Error(`Upload failed with status ${response.status}: ${response.statusText}`);
@@ -395,7 +395,7 @@ export async function verifyTransaction(txId: string): Promise<ArweaveTransactio
     const response = await networkService.post<any>(
       endpoint, 
       { query }, 
-      { 'Content-Type': 'application/json' },
+      { contentType: 'application/json' },
       { retries: 2, retryDelay: 1000 }
     );
     

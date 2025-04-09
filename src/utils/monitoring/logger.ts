@@ -4,26 +4,26 @@ import * as vscode from 'vscode';
  * Log levels for the extension
  */
 export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3
+  debug = 0,
+  info = 1,
+  warn = 2,
+  error = 3
 }
 
 /**
  * Extension logger class to centralize all logging
  */
 export class Logger {
-  private static instance: Logger;
-  private outputChannel: vscode.OutputChannel;
-  private _logLevel: LogLevel = LogLevel.INFO;
+  private static _instance: Logger;
+  private _outputChannel: vscode.OutputChannel;
+  private _logLevel: LogLevel = LogLevel.info;
   
   /**
    * Create a new logger instance
    * @param channelName Name of the output channel
    */
   private constructor(channelName: string) {
-    this.outputChannel = vscode.window.createOutputChannel(channelName);
+    this._outputChannel = vscode.window.createOutputChannel(channelName);
   }
   
   /**
@@ -32,17 +32,17 @@ export class Logger {
    * @returns Logger instance
    */
   public static getInstance(channelName: string = 'MD-AR-EXT'): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger(channelName);
+    if (!Logger._instance) {
+      Logger._instance = new Logger(channelName);
     }
-    return Logger.instance;
+    return Logger._instance;
   }
   
   /**
    * Get the output channel
    */
   public get channel(): vscode.OutputChannel {
-    return this.outputChannel;
+    return this._outputChannel;
   }
   
   /**
@@ -66,7 +66,7 @@ export class Logger {
    * @param category Optional category
    * @returns Formatted message
    */
-  private formatMessage(message: string, category?: string): string {
+  private _formatMessage(message: string, category?: string): string {
     const timestamp = new Date().toISOString();
     return category
       ? `[${timestamp}] [${category}] ${message}`
@@ -79,9 +79,9 @@ export class Logger {
    * @param category Optional category
    */
   public debug(message: string, category?: string): void {
-    if (this._logLevel <= LogLevel.DEBUG) {
-      const formattedMessage = this.formatMessage(message, category || 'DEBUG');
-      this.outputChannel.appendLine(formattedMessage);
+    if (this._logLevel <= LogLevel.debug) {
+      const formattedMessage = this._formatMessage(message, category || 'DEBUG');
+      this._outputChannel.appendLine(formattedMessage);
       console.debug(formattedMessage);
     }
   }
@@ -92,9 +92,9 @@ export class Logger {
    * @param category Optional category
    */
   public info(message: string, category?: string): void {
-    if (this._logLevel <= LogLevel.INFO) {
-      const formattedMessage = this.formatMessage(message, category || 'INFO');
-      this.outputChannel.appendLine(formattedMessage);
+    if (this._logLevel <= LogLevel.info) {
+      const formattedMessage = this._formatMessage(message, category || 'INFO');
+      this._outputChannel.appendLine(formattedMessage);
       console.info(formattedMessage);
     }
   }
@@ -105,9 +105,9 @@ export class Logger {
    * @param category Optional category
    */
   public warn(message: string, category?: string): void {
-    if (this._logLevel <= LogLevel.WARN) {
-      const formattedMessage = this.formatMessage(message, category || 'WARN');
-      this.outputChannel.appendLine(formattedMessage);
+    if (this._logLevel <= LogLevel.warn) {
+      const formattedMessage = this._formatMessage(message, category || 'WARN');
+      this._outputChannel.appendLine(formattedMessage);
       console.warn(formattedMessage);
     }
   }
@@ -119,19 +119,19 @@ export class Logger {
    * @param category Optional category
    */
   public error(message: string, error?: Error | unknown, category?: string): void {
-    if (this._logLevel <= LogLevel.ERROR) {
+    if (this._logLevel <= LogLevel.error) {
       const errorDetails = error instanceof Error 
         ? `\n${error.message}\n${error.stack || ''}`
         : error 
           ? `\n${String(error)}`
           : '';
       
-      const formattedMessage = this.formatMessage(
+      const formattedMessage = this._formatMessage(
         `${message}${errorDetails}`, 
         category || 'ERROR'
       );
       
-      this.outputChannel.appendLine(formattedMessage);
+      this._outputChannel.appendLine(formattedMessage);
       console.error(formattedMessage);
     }
   }
@@ -141,28 +141,28 @@ export class Logger {
    * @param preserveFocus Whether to preserve focus in the editor
    */
   public show(preserveFocus: boolean = false): void {
-    this.outputChannel.show(preserveFocus);
+    this._outputChannel.show(preserveFocus);
   }
   
   /**
    * Hide the output channel
    */
   public hide(): void {
-    this.outputChannel.hide();
+    this._outputChannel.hide();
   }
   
   /**
    * Clear the output channel
    */
   public clear(): void {
-    this.outputChannel.clear();
+    this._outputChannel.clear();
   }
   
   /**
    * Dispose the output channel
    */
   public dispose(): void {
-    this.outputChannel.dispose();
+    this._outputChannel.dispose();
   }
 }
 

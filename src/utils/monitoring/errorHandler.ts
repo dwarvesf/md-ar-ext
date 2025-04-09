@@ -5,38 +5,38 @@ import * as vscode from 'vscode';
  */
 export enum ErrorType {
   // General errors
-  GENERAL = 'GENERAL',
-  VALIDATION = 'VALIDATION',
-  DEPENDENCY = 'DEPENDENCY',
+  general = 'general',
+  validation = 'validation',
+  dependency = 'dependency',
   
   // Image processing errors
-  IMAGE_PROCESSING = 'IMAGE_PROCESSING',
-  IMAGE_FORMAT = 'IMAGE_FORMAT',
-  IMAGE_RESIZE = 'IMAGE_RESIZE',
+  imageProcessing = 'imageProcessing',
+  imageFormat = 'imageFormat',
+  imageResize = 'imageResize',
   
   // Arweave errors
-  ARWEAVE_CONNECTION = 'ARWEAVE_CONNECTION',
-  ARWEAVE_TRANSACTION = 'ARWEAVE_TRANSACTION',
-  ARWEAVE_WALLET = 'ARWEAVE_WALLET',
-  ARWEAVE_BALANCE = 'ARWEAVE_BALANCE',
+  arweaveConnection = 'arweaveConnection',
+  arweaveTransaction = 'arweaveTransaction',
+  arweaveWallet = 'arweaveWallet',
+  arweaveBalance = 'arweaveBalance',
   
   // File system errors
-  FILE_READ = 'FILE_READ',
-  FILE_WRITE = 'FILE_WRITE',
-  FILE_ACCESS = 'FILE_ACCESS',
+  fileRead = 'fileRead',
+  fileWrite = 'fileWrite',
+  fileAccess = 'fileAccess',
   
   // Settings errors
-  SETTINGS_VALIDATION = 'SETTINGS_VALIDATION',
-  SETTINGS_ACCESS = 'SETTINGS_ACCESS',
+  settingsValidation = 'settingsValidation',
+  settingsAccess = 'settingsAccess',
   
   // Network errors
-  NETWORK_REQUEST = 'NETWORK_REQUEST',
-  NETWORK_TIMEOUT = 'NETWORK_TIMEOUT',
-  NETWORK_RESPONSE = 'NETWORK_RESPONSE',
+  networkRequest = 'networkRequest',
+  networkTimeout = 'networkTimeout',
+  networkResponse = 'networkResponse',
   
   // User input errors
-  USER_INPUT = 'USER_INPUT',
-  USER_CANCEL = 'USER_CANCEL'
+  userInput = 'userInput',
+  userCancel = 'userCancel'
 }
 
 /**
@@ -51,7 +51,7 @@ export class ExtensionError extends Error {
   
   constructor(
     message: string, 
-    type: ErrorType = ErrorType.GENERAL, 
+    type: ErrorType = ErrorType.general, 
     details?: any,
     actionable: boolean = false,
     actionText?: string,
@@ -171,7 +171,7 @@ export function createDependencyError(
 ): ExtensionError {
   return new ExtensionError(
     `Required dependency "${dependencyName}" is not installed or not available.`,
-    ErrorType.DEPENDENCY,
+    ErrorType.dependency,
     { dependency: dependencyName, checkCommand },
     true,
     'Show Installation Guide',
@@ -199,7 +199,7 @@ export function createNetworkError(
 ): ExtensionError {
   return new ExtensionError(
     message,
-    ErrorType.NETWORK_REQUEST,
+    ErrorType.networkRequest,
     details,
     !!retryCallback,
     'Retry',

@@ -1,12 +1,13 @@
 import * as path from 'path';
-import Mocha from 'mocha';
+import mocha from 'mocha';
 import * as glob from 'glob';
 import * as fs from 'fs';
 
 // Add type declarations for global test environment
 declare global {
-  namespace NodeJS {
-    interface Global {
+  // Using interface merging instead of namespace
+  interface NodeJS {
+    global: {
       testMode: boolean;
       testTimeouts: {
         network: number;
@@ -23,7 +24,7 @@ declare global {
  */
 export async function run(): Promise<void> {
   // Create the Mocha test suite with better configuration
-  const mocha = new Mocha({
+  const mochaInstance = new mocha({
     ui: 'tdd',
     color: true,
     timeout: 20000, // Longer timeout for VS Code startup and network operations
@@ -87,7 +88,7 @@ export async function run(): Promise<void> {
       console.log(`Adding test file: ${fullPath}`);
       
       if (fs.existsSync(fullPath)) {
-        mocha.addFile(fullPath);
+        mochaInstance.addFile(fullPath);
       } else {
         console.warn(`⚠️ Test file not found: ${fullPath}`);
       }
@@ -102,7 +103,7 @@ export async function run(): Promise<void> {
         console.log('Starting test execution...');
         
         // Run the mocha test
-        mocha.run((failures: number) => {
+        mochaInstance.run((failures: number) => {
           if (failures > 0) {
             console.error(`❌ ${failures} tests failed.`);
             reject(new Error(`${failures} tests failed.`));

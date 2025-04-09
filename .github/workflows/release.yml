@@ -19,6 +19,7 @@ jobs:
     # Define a job environment variable to check for the presence of the secret
     env:
       HAS_VSCE_PAT: ${{ secrets.VSCE_PAT != '' }}
+      CI: 'true'
     
     steps:
       - uses: actions/checkout@v3
@@ -33,6 +34,13 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+      
+      - name: Create .env file
+        run: |
+          echo "# Environment created by GitHub Actions" > .env
+          echo "VSCE_PAT=${{ secrets.VSCE_PAT }}" >> .env
+          echo "# Other optional values" >> .env
+          echo "TEST_MODE=false" >> .env
       
       - name: Configure Git
         run: |

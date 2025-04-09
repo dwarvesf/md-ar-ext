@@ -8,7 +8,6 @@ suite('Logger Tests', () => {
   let loggerInstance: Logger;
   let outputChannelStub: sinon.SinonStubbedInstance<vscode.OutputChannel>;
   let createOutputChannelStub: sinon.SinonStub;
-  let consoleLogStub: sinon.SinonStub;
   let consoleInfoStub: sinon.SinonStub;
   let consoleWarnStub: sinon.SinonStub;
   let consoleErrorStub: sinon.SinonStub;
@@ -22,8 +21,6 @@ suite('Logger Tests', () => {
     createOutputChannelStub = sinon.stub(vscode.window, 'createOutputChannel');
     createOutputChannelStub.returns(outputChannelStub as any);
     
-    // Stub console methods
-    consoleLogStub = sinon.stub(console, 'log');
     consoleInfoStub = sinon.stub(console, 'info');
     consoleWarnStub = sinon.stub(console, 'warn');
     consoleErrorStub = sinon.stub(console, 'error');

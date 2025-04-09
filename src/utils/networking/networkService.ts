@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS: NetworkRequestOptions = {
  * Centralized network service for making HTTP requests
  */
 export class NetworkService {
-  private static instance: NetworkService;
+  private static _instance: NetworkService;
   
   /**
    * Create a new network service instance
@@ -40,10 +40,10 @@ export class NetworkService {
    * @returns NetworkService instance
    */
   public static getInstance(): NetworkService {
-    if (!NetworkService.instance) {
-      NetworkService.instance = new NetworkService();
+    if (!NetworkService._instance) {
+      NetworkService._instance = new NetworkService();
     }
-    return NetworkService.instance;
+    return NetworkService._instance;
   }
   
   /**
@@ -51,12 +51,12 @@ export class NetworkService {
    * @param ms Timeout in milliseconds
    * @returns Promise that rejects after timeout
    */
-  private createTimeout(ms: number): Promise<never> {
+  private _createTimeout(ms: number): Promise<never> {
     return new Promise((_, reject) => {
       setTimeout(() => {
         reject(new ExtensionError(
           `Request timed out after ${ms}ms`,
-          ErrorType.NETWORK_TIMEOUT
+          ErrorType.networkTimeout
         ));
       }, ms);
     });
@@ -67,7 +67,7 @@ export class NetworkService {
    * @param ms Delay in milliseconds
    * @returns Promise that resolves after delay
    */
-  private async delay(ms: number): Promise<void> {
+  private async _delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
   
@@ -99,14 +99,14 @@ export class NetworkService {
         // Add timeout
         const response: Response = await Promise.race([
           fetchPromise,
-          this.createTimeout(timeout)
+          this._createTimeout(timeout)
         ]);
         
         // Check for HTTP errors
         if (!response.ok) {
           throw new ExtensionError(
             `HTTP error ${response.status}: ${response.statusText}`,
-            ErrorType.NETWORK_RESPONSE,
+            ErrorType.networkResponse,
             { status: response.status, statusText: response.statusText }
           );
         }
@@ -134,7 +134,7 @@ export class NetworkService {
           // Use exponential backoff
           const delay = retryDelay * Math.pow(2, attempt);
           logger.debug(`Retrying in ${delay}ms...`, 'NETWORK');
-          await this.delay(delay);
+          await this._delay(delay);
         }
       }
     }
@@ -185,7 +185,7 @@ export class NetworkService {
   public async post<T>(url: string, body: any, headers?: Record<string, string>, options?: NetworkRequestOptions): Promise<T> {
     const isJson = typeof body === 'object';
     const contentHeaders = {
-      'Content-Type': isJson ? 'application/json' : 'text/plain',
+      contentType: isJson ? 'application/json' : 'text/plain',
       ...headers
     };
     

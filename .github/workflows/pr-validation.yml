@@ -7,6 +7,8 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      CI: 'true'
     
     steps:
       - uses: actions/checkout@v3
@@ -19,6 +21,13 @@ jobs:
       
       - name: Install dependencies
         run: npm ci
+      
+      - name: Create .env file
+        run: |
+          echo "# Environment created by GitHub Actions" > .env
+          echo "VSCE_PAT=dummy-value-for-ci" >> .env
+          echo "# Other optional values" >> .env
+          echo "TEST_MODE=true" >> .env
       
       - name: Lint
         run: npm run lint

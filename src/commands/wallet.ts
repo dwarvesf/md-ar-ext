@@ -117,7 +117,9 @@ export async function handleWalletHistory(context: vscode.ExtensionContext): Pro
       return;
     }
     
-    const wallet = JSON.parse(privateKeyJson);
+    // Parse the key but we don't need the actual wallet object yet
+    // Will be used in future implementation
+    JSON.parse(privateKeyJson);
     
     // Show progress indicator
     await vscode.window.withProgress({

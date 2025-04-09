@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as im from 'imagemagick';
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
+import * as childProcess from 'child_process';
 import * as os from 'os';
 import * as settingsManager from '../storage/settingsManager';
 
@@ -46,10 +46,10 @@ export async function checkImageMagickDetails(): Promise<{
     meetRequirements: boolean;
   }>((resolve) => {
     // First try the 'magick' command (newer versions)
-    child_process.exec('magick -version', (error, stdout) => {
+    childProcess.exec('magick -version', (error, stdout) => {
       if (error) {
         // Then try the 'convert' command (older versions)
-        child_process.exec('convert -version', (error2, stdout2) => {
+        childProcess.exec('convert -version', (error2, stdout2) => {
           if (error2) {
             // ImageMagick not installed
             resolve({

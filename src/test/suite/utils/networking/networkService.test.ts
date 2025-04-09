@@ -2,7 +2,7 @@
   import { suite, test } from 'mocha';
   import * as sinon from 'sinon';
   import * as fetchModule from 'node-fetch';
-  import { networkService, NetworkService } from '../../../../utils/networking/networkService';
+  import { networkService } from '../../../../utils/networking/networkService';
   import { ExtensionError, ErrorType } from '../../../../utils/monitoring/errorHandler';
 
 // Mock Response class

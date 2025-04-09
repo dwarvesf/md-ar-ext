@@ -383,7 +383,7 @@ suite('Image Commands Test Suite', () => {
     });
     
     // Stub transaction verification
-    sandbox.stub(global, 'setTimeout').callsFake((callback: Function) => {
+    sandbox.stub(global, 'setTimeout').callsFake((callback: () => void) => {
       callback();
       return {} as any;
     });
@@ -419,8 +419,6 @@ suite('Image Commands Test Suite', () => {
   
   test('handlePasteImage should handle empty clipboard', async () => {
     // Mock empty clipboard
-    const emptyImage = Buffer.from('');
-    const readImageStub = sandbox.stub(vscode.env.clipboard, 'readImage').resolves(emptyImage);
     
     // Stub fs functions
     const writeFileStub = sandbox.stub(fs, 'writeFileSync');
@@ -522,7 +520,7 @@ suite('Image Commands Test Suite', () => {
     });
     
     // Stub transaction verification
-    sandbox.stub(global, 'setTimeout').callsFake((callback: Function) => {
+    sandbox.stub(global, 'setTimeout').callsFake((callback: () => void) => {
       callback();
       return {} as any;
     });

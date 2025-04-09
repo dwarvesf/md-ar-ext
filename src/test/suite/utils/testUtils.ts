@@ -5,6 +5,8 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as childProcess from 'child_process';
+import * as imagemagick from 'imagemagick';
 
 // Import the mocks
 import { mockVSCode, setupVSCodeMocks, resetVSCodeMocks } from './mocks/vscode';
@@ -14,29 +16,29 @@ import { mockVSCode, setupVSCodeMocks, resetVSCodeMocks } from './mocks/vscode';
  */
 export class TestUtils {
   // The sinon sandbox for test isolation
-  private static sandbox: sinon.SinonSandbox | null = null;
+  private static _sandbox: sinon.SinonSandbox | null = null;
   
   // Temporary test directory
-  private static tempDir: string = '';
+  private static _tempDir: string = '';
   
   // Files created during tests that need cleanup
-  private static tempFiles: string[] = [];
+  private static _tempFiles: string[] = [];
 
   /**
    * Sets up the test environment
    */
   static setup(): sinon.SinonSandbox {
     // Create a sinon sandbox
-    this.sandbox = sinon.createSandbox();
+    this._sandbox = sinon.createSandbox();
     
     // Setup VS Code mocks
     setupVSCodeMocks();
     
     // Create a temporary directory for test files
-    this.tempDir = path.join(os.tmpdir(), 'md-ar-ext-test-' + Date.now());
-    fs.mkdirSync(this.tempDir, { recursive: true });
+    this._tempDir = path.join(os.tmpdir(), 'md-ar-ext-test-' + Date.now());
+    fs.mkdirSync(this._tempDir, { recursive: true });
     
-    return this.sandbox;
+    return this._sandbox;
   }
   
   /**
@@ -44,28 +46,28 @@ export class TestUtils {
    */
   static teardown(): void {
     // Restore sinon stubs
-    if (this.sandbox) {
-      this.sandbox.restore();
-      this.sandbox = null;
+    if (this._sandbox) {
+      this._sandbox.restore();
+      this._sandbox = null;
     }
     
     // Reset VS Code mocks
     resetVSCodeMocks();
     
     // Clean up temporary files
-    this.tempFiles.forEach(file => {
+    this._tempFiles.forEach(file => {
       if (fs.existsSync(file)) {
         fs.unlinkSync(file);
       }
     });
     
     // Clean up temporary directory
-    if (fs.existsSync(this.tempDir)) {
-      fs.rmdirSync(this.tempDir, { recursive: true });
+    if (fs.existsSync(this._tempDir)) {
+      fs.rmdirSync(this._tempDir, { recursive: true });
     }
     
     // Reset state
-    this.tempFiles = [];
+    this._tempFiles = [];
   }
   
   /**
@@ -75,9 +77,9 @@ export class TestUtils {
    * @returns The full path to the created file
    */
   static createTempFile(name: string, content: string | Buffer = 'dummy content'): string {
-    const filePath = path.join(this.tempDir, name);
+    const filePath = path.join(this._tempDir, name);
     fs.writeFileSync(filePath, content);
-    this.tempFiles.push(filePath);
+    this._tempFiles.push(filePath);
     return filePath;
   }
   
@@ -86,7 +88,7 @@ export class TestUtils {
    * @returns Path to the temporary directory
    */
   static getTempDir(): string {
-    return this.tempDir;
+    return this._tempDir;
   }
   
   /**
@@ -95,10 +97,10 @@ export class TestUtils {
    * @returns Sinon stub for exec
    */
   static mockChildProcessExec(): sinon.SinonStub {
-    if (!this.sandbox) {
+    if (!this._sandbox) {
       throw new Error('TestUtils.setup() must be called before mockChildProcessExec');
     }
-    return this.sandbox.stub(require('child_process'), 'exec');
+    return this._sandbox.stub(childProcess, 'exec');
   }
   
   /**
@@ -107,10 +109,10 @@ export class TestUtils {
    * @returns Sinon stub for identify
    */
   static mockImageMagickIdentify(): sinon.SinonStub {
-    if (!this.sandbox) {
+    if (!this._sandbox) {
       throw new Error('TestUtils.setup() must be called before mockImageMagickIdentify');
     }
-    return this.sandbox.stub(require('imagemagick'), 'identify').returns({} as any);
+    return this._sandbox.stub(imagemagick, 'identify').returns({} as any);
   }
   
   /**
@@ -119,10 +121,10 @@ export class TestUtils {
    * @returns Sinon stub for convert
    */
   static mockImageMagickConvert(): sinon.SinonStub {
-    if (!this.sandbox) {
+    if (!this._sandbox) {
       throw new Error('TestUtils.setup() must be called before mockImageMagickConvert');
     }
-    return this.sandbox.stub(require('imagemagick'), 'convert').returns({} as any);
+    return this._sandbox.stub(imagemagick, 'convert').returns({} as any);
   }
   
   /**

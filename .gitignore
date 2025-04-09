@@ -6,6 +6,7 @@ out/
 # Build files
 *.vsix
 .vsix-temp/
+releases/
 
 # Environment and configuration files
 .env

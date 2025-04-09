@@ -12,6 +12,10 @@ NODE := node
 NPM := npm
 VSCE := npx vsce
 
+# Directory structure
+RELEASE_DIR := releases
+DIST_DIR := dist
+
 # Colors
 YELLOW := \033[1;33m
 GREEN := \033[1;32m
@@ -21,7 +25,8 @@ RESET := \033[0m
 
 # Targets
 .PHONY: all setup setup-first deps clean clean-all dev build package publish check \
-        env-setup env-create env-check release-patch release-minor release-major help
+        env-setup env-create env-check release-patch release-minor release-major \
+        ensure-release-dir help
 
 all: setup build
 
@@ -128,27 +133,31 @@ lint:
 	@$(NPM) run lint
 
 # Package and publish
-package:
+package: ensure-release-dir
 	@echo "$(BLUE)Packaging extension...$(RESET)"
-	@$(NPM) run package
-	@echo "$(GREEN)✓ Package created$(RESET)"
+	@$(NPM) run package -- --out $(RELEASE_DIR)
+	@echo "$(GREEN)✓ Package created in $(RELEASE_DIR) directory$(RESET)"
 
-publish: env-check
+# Ensure release directory exists
+ensure-release-dir:
+	@mkdir -p $(RELEASE_DIR)
+
+publish: env-check ensure-release-dir
 	@echo "$(BLUE)Publishing extension...$(RESET)"
-	@$(NPM) run publish
+	@$(NPM) run publish -- --packagePath $(RELEASE_DIR)/*.vsix
 
 # Release commands
-release-patch:
+release-patch: ensure-release-dir
 	@echo "$(BLUE)Creating patch release...$(RESET)"
-	@$(NPM) run release:patch
+	@$(NPM) run release:patch -- --out $(RELEASE_DIR)
 
-release-minor:
+release-minor: ensure-release-dir
 	@echo "$(BLUE)Creating minor release...$(RESET)"
-	@$(NPM) run release:minor
+	@$(NPM) run release:minor -- --out $(RELEASE_DIR)
 
-release-major:
+release-major: ensure-release-dir
 	@echo "$(BLUE)Creating major release...$(RESET)"
-	@$(NPM) run release:major
+	@$(NPM) run release:major -- --out $(RELEASE_DIR)
 
 # Clean commands
 clean:
@@ -157,8 +166,8 @@ clean:
 	@echo "$(GREEN)✓ Clean completed$(RESET)"
 
 clean-all: clean
-	@echo "$(BLUE)Removing node_modules...$(RESET)"
-	@rm -rf node_modules
+	@echo "$(BLUE)Removing node_modules and release directory...$(RESET)"
+	@rm -rf node_modules $(RELEASE_DIR)
 	@echo "$(GREEN)✓ All cleaned$(RESET)"
 
 # Help
@@ -180,15 +189,15 @@ help:
 	@echo "  $(GREEN)make lint$(RESET)       - Run linter"
 	@echo ""
 	@echo "$(BLUE)Release:$(RESET)"
-	@echo "  $(GREEN)make package$(RESET)      - Create VSIX package"
+	@echo "  $(GREEN)make package$(RESET)      - Create VSIX package in $(RELEASE_DIR) directory"
 	@echo "  $(GREEN)make publish$(RESET)      - Publish to VS Code Marketplace"
-	@echo "  $(GREEN)make release-patch$(RESET) - Create patch release (0.0.X)"
-	@echo "  $(GREEN)make release-minor$(RESET) - Create minor release (0.X.0)"
-	@echo "  $(GREEN)make release-major$(RESET) - Create major release (X.0.0)"
+	@echo "  $(GREEN)make release-patch$(RESET) - Create patch release (0.0.X) in $(RELEASE_DIR) directory"
+	@echo "  $(GREEN)make release-minor$(RESET) - Create minor release (0.X.0) in $(RELEASE_DIR) directory"
+	@echo "  $(GREEN)make release-major$(RESET) - Create major release (X.0.0) in $(RELEASE_DIR) directory"
 	@echo ""
 	@echo "$(BLUE)Clean:$(RESET)"
 	@echo "  $(GREEN)make clean$(RESET)      - Clean build artifacts"
-	@echo "  $(GREEN)make clean-all$(RESET)  - Clean everything including node_modules"
+	@echo "  $(GREEN)make clean-all$(RESET)  - Clean everything including node_modules and $(RELEASE_DIR)"
 	@echo ""
 
 # Default target
