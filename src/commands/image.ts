@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
+import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 import {
   isImageFile,
@@ -10,7 +10,7 @@ import {
   showImageMagickInstallInstructions,
   ImageProcessOptions,
   ImageProcessResult,
-} from "../utils/processing/imageProcessor";
+} from '../utils/processing/imageProcessor';
 
 import {
   uploadToArweave,
@@ -20,20 +20,20 @@ import {
   verifyTransaction,
   ArweaveUploadOptions,
   ArweaveUploadResult,
-} from "../utils/processing/arweaveUploader";
+} from '../utils/processing/arweaveUploader';
 
-import { getOrPromptForPrivateKey } from "../utils/storage/keyManager";
-import { withCancellableProgress } from "../utils/monitoring/progressIndicator";
-import { trackUpload } from "../utils/monitoring/statsTracker";
+import { getOrPromptForPrivateKey } from '../utils/storage/keyManager';
+import { withCancellableProgress } from '../utils/monitoring/progressIndicator';
+import { trackUpload } from '../utils/monitoring/statsTracker';
 import {
   getWebpQuality,
   getMaxDimensions,
   getMetadataTagsEnabled,
   getCustomTags,
   getSetting,
-} from "../utils/storage/settingsManager";
+} from '../utils/storage/settingsManager';
 
-import { getImageFromClipboard } from "../utils/processing/clipboardHandler";
+import { getImageFromClipboard } from '../utils/processing/clipboardHandler';
 
 /**
  * Handle pasting an image from the clipboard and inserting it into the document
@@ -44,7 +44,7 @@ export async function handlePasteImage(
 ): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
-    vscode.window.showErrorMessage("No active editor");
+    vscode.window.showErrorMessage('No active editor');
     return;
   }
 
@@ -53,7 +53,7 @@ export async function handlePasteImage(
     const imageBuffer = await getImageFromClipboard();
 
     if (!imageBuffer) {
-      vscode.window.showInformationMessage("No image found in clipboard");
+      vscode.window.showInformationMessage('No image found in clipboard');
       return;
     }
 
@@ -81,7 +81,7 @@ export async function handleUploadImage(
 ): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
-    vscode.window.showErrorMessage("No active editor");
+    vscode.window.showErrorMessage('No active editor');
     return;
   }
 
@@ -89,9 +89,9 @@ export async function handleUploadImage(
   const fileUris = await vscode.window.showOpenDialog({
     canSelectMany: false,
     filters: {
-      images: ["png", "jpg", "jpeg", "gif", "webp", "avif"],
+      images: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'],
     },
-    title: "Select an image to upload",
+    title: 'Select an image to upload',
   });
 
   if (!fileUris || fileUris.length === 0) {
@@ -115,9 +115,9 @@ export async function processImageOnly(
   const fileUris = await vscode.window.showOpenDialog({
     canSelectMany: false,
     filters: {
-      images: ["png", "jpg", "jpeg", "gif", "webp", "avif"],
+      images: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'],
     },
-    title: "Select an image to process",
+    title: 'Select an image to process',
   });
 
   if (!fileUris || fileUris.length === 0) {
@@ -131,7 +131,7 @@ export async function processImageOnly(
     const isValid = await isImageFile(filePath);
     if (!isValid) {
       vscode.window.showErrorMessage(
-        "Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)"
+        'Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)'
       );
       return;
     }
@@ -141,25 +141,25 @@ export async function processImageOnly(
       webpQuality: getWebpQuality(),
       maxWidth: getMaxDimensions().width,
       maxHeight: getMaxDimensions().height,
-      preserveOriginal: getSetting("preserveOriginalImages", true),
+      preserveOriginal: getSetting('preserveOriginalImages', true),
     };
 
     // Process the image with progress indication
     await withCancellableProgress(
-      "Processing image",
+      'Processing image',
       async (progress, token) => {
         // Handle cancellation
         token.onCancellationRequested(() => {
-          vscode.window.showInformationMessage("Image processing cancelled");
-          throw new Error("Operation cancelled by user");
+          vscode.window.showInformationMessage('Image processing cancelled');
+          throw new Error('Operation cancelled by user');
         });
 
-        progress.report({ message: "Processing image...", increment: 10 });
+        progress.report({ message: 'Processing image...', increment: 10 });
 
         const result = await processImage(filePath, options, progress);
 
         // Show the results
-        progress.report({ message: "Completed", increment: 100 });
+        progress.report({ message: 'Completed', increment: 100 });
 
         const message = `
         Original: ${formatFileSize(result.originalSize)}
@@ -171,22 +171,22 @@ export async function processImageOnly(
 
         vscode.window
           .showInformationMessage(
-            "Image processed successfully",
-            "View Details",
-            "Open File"
+            'Image processed successfully',
+            'View Details',
+            'Open File'
           )
           .then((selection) => {
-            if (selection === "View Details") {
+            if (selection === 'View Details') {
               // Show detailed results in a new document
               const detailsDoc = vscode.workspace.openTextDocument({
                 content: message,
-                language: "markdown",
+                language: 'markdown',
               });
               detailsDoc.then((doc) => vscode.window.showTextDocument(doc));
-            } else if (selection === "Open File") {
+            } else if (selection === 'Open File') {
               // Open the processed file
               vscode.commands.executeCommand(
-                "vscode.open",
+                'vscode.open',
                 vscode.Uri.file(result.processedFilePath)
               );
             }
@@ -197,7 +197,7 @@ export async function processImageOnly(
     // Handle errors unless it's a cancellation
     if (
       error instanceof Error &&
-      error.message === "Operation cancelled by user"
+      error.message === 'Operation cancelled by user'
     ) {
       return;
     }
@@ -215,11 +215,11 @@ export async function checkImageMagickInstallation(): Promise<void> {
   if (!details.installed) {
     vscode.window
       .showWarningMessage(
-        "ImageMagick is required for image processing but does not appear to be installed.",
-        "Show Installation Instructions"
+        'ImageMagick is required for image processing but does not appear to be installed.',
+        'Show Installation Instructions'
       )
       .then((selection) => {
-        if (selection === "Show Installation Instructions") {
+        if (selection === 'Show Installation Instructions') {
           showImageMagickInstallInstructions();
         }
       });
@@ -230,10 +230,10 @@ export async function checkImageMagickInstallation(): Promise<void> {
     vscode.window
       .showWarningMessage(
         `ImageMagick ${details.version} is installed, but version 7.0+ is recommended for best results.`,
-        "Show Installation Instructions"
+        'Show Installation Instructions'
       )
       .then((selection) => {
-        if (selection === "Show Installation Instructions") {
+        if (selection === 'Show Installation Instructions') {
           showImageMagickInstallInstructions();
         }
       });
@@ -261,7 +261,7 @@ async function uploadAndInsertImage(
     const isValid = await isImageFile(filePath);
     if (!isValid) {
       vscode.window.showErrorMessage(
-        "Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)"
+        'Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)'
       );
       return;
     }
@@ -274,7 +274,7 @@ async function uploadAndInsertImage(
     return;
   }
 
-  let processedFilePath = "";
+  let processedFilePath = '';
   let wallet: any = null;
   let isCancelled = false;
   let result: ImageProcessResult | null = null;
@@ -283,17 +283,17 @@ async function uploadAndInsertImage(
   try {
     // Process with cancellable progress indicator
     await withCancellableProgress(
-      "Processing and uploading image",
+      'Processing and uploading image',
       async (progress, token) => {
         // Set up cancellation
         token.onCancellationRequested(() => {
           isCancelled = true;
-          vscode.window.showInformationMessage("Operation cancelled");
-          throw new Error("Operation cancelled by user");
+          vscode.window.showInformationMessage('Operation cancelled');
+          throw new Error('Operation cancelled by user');
         });
 
         // Get private key
-        progress.report({ message: "Getting credentials...", increment: 5 });
+        progress.report({ message: 'Getting credentials...', increment: 5 });
         const privateKeyJson = await getOrPromptForPrivateKey(context);
         if (!privateKeyJson) return;
 
@@ -302,7 +302,7 @@ async function uploadAndInsertImage(
           wallet = JSON.parse(privateKeyJson);
         } catch (error) {
           throw new Error(
-            "Invalid Arweave key format. Please update your key."
+            'Invalid Arweave key format. Please update your key.'
           );
         }
 
@@ -317,10 +317,10 @@ async function uploadAndInsertImage(
         });
 
         // Check balance if setting enabled
-        if (getSetting("checkBalanceBeforeUpload", true)) {
+        if (getSetting('checkBalanceBeforeUpload', true)) {
           // Estimate upload cost and check balance
           progress.report({
-            message: "Checking wallet balance...",
+            message: 'Checking wallet balance...',
             increment: 5,
           });
           const balanceCheck = await checkBalanceSufficient(
@@ -331,37 +331,37 @@ async function uploadAndInsertImage(
           if (!balanceCheck.sufficient) {
             const proceed = await vscode.window.showWarningMessage(
               `Your wallet balance (${balanceCheck.balance} AR) may be insufficient for this upload (est. ${balanceCheck.required} AR). Continue anyway?`,
-              "Continue",
-              "Cancel"
+              'Continue',
+              'Cancel'
             );
 
-            if (proceed !== "Continue") {
-              throw new Error("Upload cancelled due to insufficient balance");
+            if (proceed !== 'Continue') {
+              throw new Error('Upload cancelled due to insufficient balance');
             }
           }
         }
 
         // Process image
-        progress.report({ message: "Processing image...", increment: 10 });
+        progress.report({ message: 'Processing image...', increment: 10 });
 
         const options: ImageProcessOptions = {
           webpQuality: getWebpQuality(),
           maxWidth: getMaxDimensions().width,
           maxHeight: getMaxDimensions().height,
-          preserveOriginal: getSetting("preserveOriginalImages", true),
+          preserveOriginal: getSetting('preserveOriginalImages', true),
         };
 
         result = await processImage(filePath, options, progress);
         processedFilePath = result.processedFilePath;
 
         // Upload to Arweave
-        progress.report({ message: "Uploading to Arweave...", increment: 20 });
+        progress.report({ message: 'Uploading to Arweave...', increment: 20 });
 
         const uploadOptions: ArweaveUploadOptions = {
           tags: getCustomTags(),
           enableMetadataTags: getMetadataTagsEnabled(),
-          retryCount: getSetting("retryCount", 3),
-          retryDelay: getSetting("retryDelay", 1000),
+          retryCount: getSetting('retryCount', 3),
+          retryDelay: getSetting('retryDelay', 1000),
         };
 
         uploadResult = await uploadToArweave(
@@ -375,7 +375,7 @@ async function uploadAndInsertImage(
         // Insert markdown into document
         const mdLink = createMarkdownLink(uploadResult.url, fileName);
 
-        progress.report({ message: "Inserting link...", increment: 5 });
+        progress.report({ message: 'Inserting link...', increment: 5 });
 
         await editor.edit((editBuilder) => {
           editBuilder.insert(editor.selection.active, mdLink);
@@ -389,9 +389,9 @@ async function uploadAndInsertImage(
             result.originalSize,
             result.processedSize,
             uploadResult.cost.ar,
-            uploadResult.cost.usd || "0.00",
+            uploadResult.cost.usd || '0.00',
             uploadResult.txId,
-            "image/webp"
+            'image/webp'
           );
         }
 
@@ -406,7 +406,7 @@ async function uploadAndInsertImage(
             `Upload complete! ${sizeReduction}`
           );
         } else {
-          vscode.window.showInformationMessage("Upload complete!");
+          vscode.window.showInformationMessage('Upload complete!');
         }
 
         // Verify transaction in background
@@ -450,12 +450,13 @@ async function uploadAndInsertImage(
       fs.existsSync(processedFilePath)
     ) {
       try {
-        const preserveProcessed = getSetting("preserveProcessedImages", false);
+        const preserveProcessed = getSetting('preserveProcessedImages', false);
         if (!preserveProcessed) {
           fs.unlinkSync(processedFilePath);
         }
       } catch (error) {
-        // Silent fail on cleanup
+        // Silent fail on cleanup - log error for debugging
+        console.error('Failed to clean up temporary file:', error);
       }
     }
   }
@@ -483,7 +484,7 @@ export async function handleDropImage(
 
     // Check if the current line contains a local image reference
     const isLocalImageLine =
-      (lineText.startsWith("![") && lineText.includes(`](${fileName})`)) ||
+      (lineText.startsWith('![') && lineText.includes(`](${fileName})`)) ||
       lineText.includes(`](<${fileName}>`);
 
     if (isLocalImageLine) {
@@ -513,7 +514,7 @@ export async function handleDropImage(
         fs.unlinkSync(filePath);
       }
     } catch (error) {
-      console.error("Failed to delete local file:", error);
+      console.error('Failed to delete local file:', error);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -536,7 +537,7 @@ async function processAndUploadImage(
     const isValid = await isImageFile(filePath);
     if (!isValid) {
       vscode.window.showErrorMessage(
-        "Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)"
+        'Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)'
       );
       return null;
     }
@@ -549,7 +550,7 @@ async function processAndUploadImage(
     return null;
   }
 
-  let processedFilePath = "";
+  let processedFilePath = '';
   let wallet: any = null;
   let result: ImageProcessResult | null = null;
   let uploadResult: ArweaveUploadResult | null = null;
@@ -557,10 +558,10 @@ async function processAndUploadImage(
   try {
     // Process with cancellable progress indicator
     const processResult = await withCancellableProgress(
-      "Processing and uploading image",
+      'Processing and uploading image',
       async (progress, token) => {
         // Get private key
-        progress.report({ message: "Getting credentials...", increment: 5 });
+        progress.report({ message: 'Getting credentials...', increment: 5 });
         const privateKeyJson = await getOrPromptForPrivateKey(context);
         if (!privateKeyJson) return null;
 
@@ -569,7 +570,7 @@ async function processAndUploadImage(
           wallet = JSON.parse(privateKeyJson);
         } catch (error) {
           throw new Error(
-            "Invalid Arweave key format. Please update your key."
+            'Invalid Arweave key format. Please update your key.'
           );
         }
 
@@ -579,9 +580,9 @@ async function processAndUploadImage(
         const fileName = path.basename(filePath, path.extname(filePath));
 
         // Check balance if setting enabled
-        if (getSetting("checkBalanceBeforeUpload", true)) {
+        if (getSetting('checkBalanceBeforeUpload', true)) {
           progress.report({
-            message: "Checking wallet balance...",
+            message: 'Checking wallet balance...',
             increment: 5,
           });
           const balanceCheck = await checkBalanceSufficient(
@@ -592,35 +593,35 @@ async function processAndUploadImage(
           if (!balanceCheck.sufficient) {
             const proceed = await vscode.window.showWarningMessage(
               `Your wallet balance (${balanceCheck.balance} AR) may be insufficient for this upload (est. ${balanceCheck.required} AR). Continue anyway?`,
-              "Continue",
-              "Cancel"
+              'Continue',
+              'Cancel'
             );
 
-            if (proceed !== "Continue") {
-              throw new Error("Upload cancelled due to insufficient balance");
+            if (proceed !== 'Continue') {
+              throw new Error('Upload cancelled due to insufficient balance');
             }
           }
         }
 
         // Process image
-        progress.report({ message: "Processing image...", increment: 10 });
+        progress.report({ message: 'Processing image...', increment: 10 });
         const options: ImageProcessOptions = {
           webpQuality: getWebpQuality(),
           maxWidth: getMaxDimensions().width,
           maxHeight: getMaxDimensions().height,
-          preserveOriginal: getSetting("preserveOriginalImages", true),
+          preserveOriginal: getSetting('preserveOriginalImages', true),
         };
 
         result = await processImage(filePath, options, progress);
         processedFilePath = result.processedFilePath;
 
         // Upload to Arweave
-        progress.report({ message: "Uploading to Arweave...", increment: 20 });
+        progress.report({ message: 'Uploading to Arweave...', increment: 20 });
         const uploadOptions: ArweaveUploadOptions = {
           tags: getCustomTags(),
           enableMetadataTags: getMetadataTagsEnabled(),
-          retryCount: getSetting("retryCount", 3),
-          retryDelay: getSetting("retryDelay", 1000),
+          retryCount: getSetting('retryCount', 3),
+          retryDelay: getSetting('retryDelay', 1000),
         };
 
         uploadResult = await uploadToArweave(
@@ -639,9 +640,9 @@ async function processAndUploadImage(
             result.originalSize,
             result.processedSize,
             uploadResult.cost.ar,
-            uploadResult.cost.usd || "0.00",
+            uploadResult.cost.usd || '0.00',
             uploadResult.txId,
-            "image/webp"
+            'image/webp'
           );
         }
 
@@ -656,8 +657,6 @@ async function processAndUploadImage(
     );
 
     return processResult || null;
-  } catch (error) {
-    throw error;
   } finally {
     // Cleanup temporary processed file
     if (
@@ -666,7 +665,7 @@ async function processAndUploadImage(
       fs.existsSync(processedFilePath)
     ) {
       try {
-        const preserveProcessed = getSetting("preserveProcessedImages", false);
+        const preserveProcessed = getSetting('preserveProcessedImages', false);
         if (!preserveProcessed) {
           fs.unlinkSync(processedFilePath);
         }
