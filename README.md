@@ -26,12 +26,14 @@ Verify installation with: `magick --version` or `convert --version`
 ### Install the Extension
 
 **Option 1: From VS Code Marketplace**
+
 1. Open VS Code
 2. Go to Extensions (Ctrl+Shift+X or Cmd+Shift+X)
 3. Search for "Markdown Arweave Uploader"
 4. Click "Install"
 
 **Option 2: From VSIX File**
+
 1. Download the `.vsix` file from [GitHub Releases](https://github.com/dwarvesf/md-ar-ext/releases)
 2. In VS Code, go to Extensions
 3. Click the "..." menu and select "Install from VSIX..."
@@ -46,48 +48,77 @@ npm run webpack-prod
 npm run package
 ```
 
+## Setup with Make Commands
+
+We provide a Makefile to simplify common tasks for both users and developers.
+
+### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/dwarvesf/md-ar-ext.git
+cd md-ar-ext
+
+# Run interactive setup (recommended for first-time users)
+make setup-first
+
+# To see all available commands
+make help
+```
+
+The interactive setup will:
+
+- Check and install dependencies (Node.js, npm, ImageMagick)
+- Configure your environment variables
+- Install npm packages
+
+### Essential Make Commands
+
+| Command | Description |
+|---------|-------------|
+| `make setup-first` | Interactive first-time setup |
+| `make setup` | Install dependencies |
+| `make deps` | Check/install system dependencies |
+| `make env-setup` | Configure environment variables |
+| `make dev` | Start development server with watch mode |
+| `make test` | Run tests |
+| `make package` | Create VSIX package |
+| `make publish` | Publish to VS Code Marketplace |
+| `make clean` | Clean build artifacts |
+
 ## Setting Up the Extension
 
 ### Initial Configuration
 
-1. **Set up your Arweave Wallet Key**:
-   - Run the command `Markdown Arweave Uploader: Update Arweave Private Key` (Ctrl+Shift+P or Cmd+Shift+P to open the command palette)
-   - Paste your JWK JSON string, or
-   - Use `Markdown Arweave Uploader: Import Arweave Key from File` to import from a file
+1. **Configure your Arweave Wallet**:
+   - Run `Markdown Arweave Uploader: Update Arweave Private Key` (Ctrl+Shift+P)
+   - Paste your JWK JSON string or use `Import Arweave Key from File`
 
-2. **Quick Configure Settings**:
-   - Run `Markdown Arweave Uploader: Quick Configure Settings` to set up common options
-   - This guides you through setting image quality, dimensions, and other preferences
+2. **Configure Settings**:
+   - Run `Markdown Arweave Uploader: Quick Configure Settings`
+   - Follow the prompts to set image quality, dimensions, etc.
 
 3. **Verify Setup**:
-   - Run `Markdown Arweave Uploader: Check ImageMagick Installation` to verify ImageMagick is properly installed
-   - Run `Markdown Arweave Uploader: Check Arweave Wallet Balance` to confirm your wallet is configured correctly
+   - Run `Markdown Arweave Uploader: Check ImageMagick Installation`
+   - Run `Markdown Arweave Uploader: Check Arweave Wallet Balance`
 
-### Customizing Settings
+### Environment Variables
 
-Access detailed settings by:
-- Running `Markdown Arweave Uploader: Open Extension Settings`, or
-- Opening VS Code Settings (Ctrl+, or Cmd+,) and searching for "Markdown Arweave Uploader"
+Manage environment variables with:
 
-**Key Settings**:
+```bash
+make env-setup  # Interactive setup
+make env-create # Quick create from template
+make env-check  # Validate configuration
+```
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `webpQuality` | WebP image quality (50-100) | 90 |
-| `maxWidth` | Maximum image width in pixels | 1876 |
-| `maxHeight` | Maximum image height in pixels | 1251 |
-| `enableMetadataTags` | Add metadata tags to Arweave uploads | false |
-| `customTags` | Custom Arweave tags (format: 'key:value') | [] |
-| `preserveOriginalImages` | Keep original image files | true |
-| `preserveProcessedImages` | Keep processed images after upload | false |
-| `showUploadProgress` | Show detailed upload progress | true |
-| `checkBalanceBeforeUpload` | Check wallet balance before uploads | true |
-| `retryCount` | Number of upload retries | 3 |
-| `showOptimizationStats` | Show image optimization statistics | true |
+**Key Environment Variables:**
 
-**Export/Import Settings**:
-- Use `Markdown Arweave Uploader: Export Settings` to save your configuration
-- Use `Markdown Arweave Uploader: Import Settings` to restore previously saved settings
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VSCE_PAT` | VS Code Marketplace Token | For publishing |
+| `AR_GATEWAY_URL` | Custom Arweave gateway | No |
+| `DEV_MODE` | Enable development mode | No |
 
 ## Usage
 
@@ -140,56 +171,57 @@ The extension uses a modular architecture with clear separation of concerns:
 
 ### Setup
 
+For development, use the Make commands described in the [Setup with Make Commands](#setup-with-make-commands) section.
+
+### Release Process
+
 ```bash
-# Clone the repository
-git clone https://github.com/dwarvesf/md-ar-ext.git
+# Create a release (patch, minor, or major)
+make release-patch  # 0.0.x
+make release-minor  # 0.x.0
+make release-major  # x.0.0
 
-# Install dependencies
-cd md-ar-ext
-npm install
-
-# Compile
-npm run compile
-
-# Run tests
-npm test
+# Publish to VS Code Marketplace
+make publish
 ```
+
+The release process automatically:
+
+1. Bumps version in package.json
+2. Updates CHANGELOG.md
+3. Builds and packages the extension
+4. Creates git commit and tag
+
+### CI/CD Pipeline
+
+This project uses GitHub Actions for automated workflows:
+
+| Workflow | Description | Trigger |
+|----------|-------------|---------|
+| **PR Validation** | Validates all pull requests | On PR creation/update |
+| **CI** | Runs tests, lint, and build | On push to main, weekly |
+| **Release** | Creates and publishes release | Manual trigger |
+
+#### Automated Release Workflow
+
+To create a release using GitHub Actions:
+
+1. Go to Actions tab → Release Extension workflow
+2. Click "Run workflow"
+3. Select version bump type
+4. The workflow will create a tagged release and optionally publish to the marketplace
+
+To enable marketplace publishing, add your `VSCE_PAT` token as a repository secret.
 
 ### Project Structure
 
 ```
 src/
-├── extension.ts                # Main extension file
+├── extension.ts                # Main extension entry point
 ├── commands/                   # Command implementations
-│   ├── image.ts                # Image-related commands
-│   ├── wallet.ts               # Wallet-related commands
-│   ├── settings.ts             # Settings-related commands
-│   └── statistics.ts           # Statistics-related commands
 ├── utils/                      # Utility modules
-│   ├── imageProcessor.ts       # Image processing utilities
-│   ├── arweaveUploader.ts      # Arweave interaction utilities
-│   ├── keyManager.ts           # Wallet key management
-│   ├── settingsManager.ts      # Settings management
-│   ├── progressIndicator.ts    # Progress reporting utilities
-│   ├── statsTracker.ts         # Statistics tracking
-│   ├── errorHandler.ts         # Centralized error handling
-│   ├── logger.ts               # Structured logging
-│   ├── networkService.ts       # Network operations with retries
-│   └── ui.ts                   # Shared UI components
 └── test/                       # Tests
-    ├── runTest.ts              # Test runner
-    └── suite/                  # Test suites
 ```
-
-### Testing
-
-We use a comprehensive testing strategy with unit tests, integration tests, and end-to-end tests:
-
-- **Unit Tests**: Test individual components in isolation
-- **Integration Tests**: Test interactions between components
-- **Logging and Error Handling**: Robust logging and error reporting
-
-See [TECH-GUIDE.md](./docs/TECH-GUIDE.md) for more details on our testing approach.
 
 ## License
 
