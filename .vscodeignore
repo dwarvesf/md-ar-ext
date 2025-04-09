@@ -16,6 +16,7 @@ webpack.config.js
 **/.DS_Store
 **/*.log
 **/package-lock.json
+.pnpm-store/**
 
 # Make sure to include the dist directory
 !dist/** 
