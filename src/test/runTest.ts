@@ -1,119 +1,81 @@
 import * as path from 'path';
-import * as fs from 'fs';
+import { runTests, downloadAndUnzipVSCode } from 'vscode-test';
 
-import {
-  downloadAndUnzipVSCode,
-  resolveCliArgsFromVSCodeExecutablePath,
-  runTests
-} from '@vscode/test-electron';
-
-/**
- * Main function to run the tests
- */
 async function main(): Promise<void> {
   try {
     // The folder containing the Extension Manifest package.json
+    // Passed to `--extensionDevelopmentPath`
     const extensionDevelopmentPath = path.resolve(__dirname, '../../');
 
-    // The path to test runner
+    // The path to the extension test script
+    // Passed to --extensionTestsPath
     const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
-    // Check if VS Code executable path is provided through environment variable
-    const customVSCodePath = process.env.VSCODE_EXECUTABLE_PATH;
-    let vscodeExecutablePath: string | undefined;
-    
-    if (customVSCodePath && fs.existsSync(customVSCodePath)) {
-      console.log(`Using custom VS Code executable: ${customVSCodePath}`);
-      vscodeExecutablePath = customVSCodePath;
-    } else {
-      console.log('Downloading VS Code for testing (this may take a while)...');
-      try {
-        const versionToDownload = 'stable'; // Use latest stable version
-        console.log(`Downloading VS Code ${versionToDownload}...`);
-        // Let the library handle caching and path resolution
-        const downloadedPath = await downloadAndUnzipVSCode(versionToDownload);
-        console.log(`VS Code downloaded/found at (reported): ${downloadedPath}`);
+    // Determine VS Code version for testing
+    const vscodeVersion = 'stable'; // Or specify a version like '1.80.0'
 
-        // --- Correction for potential path issue ---
-        // Check if the path incorrectly includes 'Visual Studio Code.app'
-        const incorrectAppSegment = '/Visual Studio Code.app/Contents/MacOS/Electron';
-        const correctSegment = '/Contents/MacOS/Electron';
-        if (downloadedPath.endsWith(incorrectAppSegment)) {
-          // Construct the likely correct path by removing the '.app' directory part
-          const baseDir = downloadedPath.substring(0, downloadedPath.length - incorrectAppSegment.length);
-          const correctedPath = path.join(baseDir, correctSegment);
-          
-          // Verify if the corrected path actually exists
-          if (fs.existsSync(correctedPath)) {
-            console.log(`Corrected path found: ${correctedPath}`);
-            vscodeExecutablePath = correctedPath;
-          } else {
-             // Fallback to the originally reported path if correction doesn't exist
-             console.warn(`Corrected path ${correctedPath} not found, falling back to reported path.`);
-             vscodeExecutablePath = downloadedPath;
-          }
-        } else {
-           // Assume the reported path is correct if it doesn't end with the known incorrect segment
-           vscodeExecutablePath = downloadedPath;
-        }
-        // --- End Correction ---
+    console.log(`Downloading VS Code ${vscodeVersion} for testing (this may take a while)...`);
+    // Download VS Code, unzip it and run the integration test
+    // downloadAndUnzipVSCode returns the path to the VS Code executable
+    // or the installation directory, depending on the platform.
+    // runTests will use this path to launch VS Code.
+    const vscodeExecutablePath = await downloadAndUnzipVSCode(vscodeVersion);
+    console.log(`Using VS Code executable/installation path: ${vscodeExecutablePath}`);
 
-        console.log(`Using VS Code executable path: ${vscodeExecutablePath}`);
-      } catch (err) {
-        console.error('Error downloading or finding VS Code path:', err);
-        throw err;
-      }
-    }
-    
-    // Verify that we have a valid executable path
-    if (!vscodeExecutablePath) {
-      throw new Error('Failed to get a valid VS Code executable path');
-    }
+    // Prepare launch arguments for VS Code
+    const launchArgs: string[] = [
+      // Add the workspace path if needed, otherwise VS Code opens empty
+      // extensionDevelopmentPath, // Uncomment if you want to open the extension folder as workspace
+      '--disable-extensions', // Disable other extensions
+      '--verbose',
+      '--disable-workspace-trust'
+    ];
 
-    // Resolve CLI args using the determined executable path, but only keep the args
-    const [, ...initialArgs] = resolveCliArgsFromVSCodeExecutablePath(vscodeExecutablePath);
-    const launchArgs = [...initialArgs];
-
-    // Add additional CLI options for better test output
-    launchArgs.push('--verbose');
-    launchArgs.push('--disable-workspace-trust');
-    
-    // If debugging, add the appropriate flags
+    // If debugging, add the appropriate flags (adjust as needed for vscode-test)
     if (process.env.DEBUG_TESTS) {
-      launchArgs.push('--disable-extensions');
-      launchArgs.push('--disable-gpu');
-      launchArgs.push('--no-sandbox');
+      // Debug flags might differ slightly or have different effects with vscode-test
+      // Common flags:
+      // launchArgs.push('--disable-gpu'); // May help on some systems
+      // launchArgs.push('--no-sandbox'); // Often needed in CI environments
+      console.log('Debug flags enabled (review if needed for vscode-test).');
     }
 
     console.log('Starting VS Code test runner...');
     console.log(`Extension path: ${extensionDevelopmentPath}`);
     console.log(`Test path: ${extensionTestsPath}`);
-    
+    console.log(`Launch args: ${launchArgs.join(' ')}`);
+
     // Make sure VS Code is not already running (warn the user)
     console.log('\n⚠️  IMPORTANT: Close all VS Code windows before running tests ⚠️\n');
 
+
     // Run the extension test
     const exitCode = await runTests({
-      vscodeExecutablePath, // Pass the resolved executable path
+      vscodeExecutablePath, // Path determined by downloadAndUnzipVSCode
       extensionDevelopmentPath,
       extensionTestsPath,
-      launchArgs, // Use the resolved args (without the incorrect executable) + custom ones
+      launchArgs,
       // Add extra environment variables for testing
       extensionTestsEnv: {
-        ...process.env,
-        testMode: 'true'
+        ...process.env, // Pass existing environment variables
+        testMode: 'true' // Custom flag for tests
       }
     });
 
     console.log(`Test run completed with exit code: ${exitCode}`);
-    process.exit(exitCode);
+    process.exit(exitCode); // Exit with the code from the test run
+
   } catch (err) {
-    console.error('Failed to run tests:', err);
+    console.error('Failed to run tests:');
     if (err instanceof Error) {
-      console.error(`Error message: ${err.message}`);
-      console.error(`Stack trace: ${err.stack}`);
+      console.error(err.message);
+      if (err.stack) {
+        console.error(err.stack);
+      }
+    } else {
+      console.error(err);
     }
-    process.exit(1);
+    process.exit(1); // Exit with error code 1
   }
 }
 
