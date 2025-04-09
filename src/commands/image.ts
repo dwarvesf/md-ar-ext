@@ -460,3 +460,219 @@ async function uploadAndInsertImage(
     }
   }
 }
+
+/**
+ * Handle drag and drop of an image file into the document
+ * @param filePath Path to the dropped image file
+ * @param editor VS Code text editor
+ * @param context Extension context
+ */
+export async function handleDropImage(
+  filePath: string,
+  editor: vscode.TextEditor,
+  context: vscode.ExtensionContext
+): Promise<void> {
+  try {
+    // Get the current document text and cursor position
+    const cursorPosition = editor.selection.active;
+    const fileName = path.basename(filePath);
+
+    // Get the current line text
+    const line = editor.document.lineAt(cursorPosition.line);
+    const lineText = line.text.trim();
+
+    // Check if the current line contains a local image reference
+    const isLocalImageLine =
+      (lineText.startsWith("![") && lineText.includes(`](${fileName})`)) ||
+      lineText.includes(`](<${fileName}>`);
+
+    if (isLocalImageLine) {
+      // If there's a local reference, we'll replace the entire line
+      const edit = new vscode.WorkspaceEdit();
+
+      // Process and upload the image, but don't insert it yet
+      const uploadResult = await processAndUploadImage(filePath, context);
+      if (uploadResult && uploadResult.url) {
+        // Create new markdown link and replace the entire line
+        const newText = createMarkdownLink(
+          uploadResult.url,
+          uploadResult.fileName
+        );
+        edit.replace(editor.document.uri, line.range, newText);
+        await vscode.workspace.applyEdit(edit);
+      }
+    } else {
+      // No local reference found, just process and upload normally
+      await uploadAndInsertImage(filePath, editor, context);
+    }
+
+    // Delete the local file after a small delay to ensure it's not in use
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (error) {
+      console.error("Failed to delete local file:", error);
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    vscode.window.showErrorMessage(
+      `Failed to process dropped image: ${errorMessage}`
+    );
+  }
+}
+
+/**
+ * Process and upload an image without inserting it into the document
+ * Returns the URL and filename if successful
+ */
+async function processAndUploadImage(
+  filePath: string,
+  context: vscode.ExtensionContext
+): Promise<{ url: string; fileName: string } | null> {
+  // Check if file is a valid image
+  try {
+    const isValid = await isImageFile(filePath);
+    if (!isValid) {
+      vscode.window.showErrorMessage(
+        "Please use a valid image file (PNG, JPG, JPEG, GIF, WEBP, AVIF - no videos or animated GIFs)"
+      );
+      return null;
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(
+      `Error validating file: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+    return null;
+  }
+
+  let processedFilePath = "";
+  let wallet: any = null;
+  let result: ImageProcessResult | null = null;
+  let uploadResult: ArweaveUploadResult | null = null;
+
+  try {
+    // Process with cancellable progress indicator
+    const processResult = await withCancellableProgress(
+      "Processing and uploading image",
+      async (progress, token) => {
+        // Get private key
+        progress.report({ message: "Getting credentials...", increment: 5 });
+        const privateKeyJson = await getOrPromptForPrivateKey(context);
+        if (!privateKeyJson) return null;
+
+        // Parse the wallet
+        try {
+          wallet = JSON.parse(privateKeyJson);
+        } catch (error) {
+          throw new Error(
+            "Invalid Arweave key format. Please update your key."
+          );
+        }
+
+        // Get file info
+        const fileStats = fs.statSync(filePath);
+        const fileSizeBytes = fileStats.size;
+        const fileName = path.basename(filePath, path.extname(filePath));
+
+        // Check balance if setting enabled
+        if (getSetting("checkBalanceBeforeUpload", true)) {
+          progress.report({
+            message: "Checking wallet balance...",
+            increment: 5,
+          });
+          const balanceCheck = await checkBalanceSufficient(
+            wallet,
+            fileSizeBytes
+          );
+
+          if (!balanceCheck.sufficient) {
+            const proceed = await vscode.window.showWarningMessage(
+              `Your wallet balance (${balanceCheck.balance} AR) may be insufficient for this upload (est. ${balanceCheck.required} AR). Continue anyway?`,
+              "Continue",
+              "Cancel"
+            );
+
+            if (proceed !== "Continue") {
+              throw new Error("Upload cancelled due to insufficient balance");
+            }
+          }
+        }
+
+        // Process image
+        progress.report({ message: "Processing image...", increment: 10 });
+        const options: ImageProcessOptions = {
+          webpQuality: getWebpQuality(),
+          maxWidth: getMaxDimensions().width,
+          maxHeight: getMaxDimensions().height,
+          preserveOriginal: getSetting("preserveOriginalImages", true),
+        };
+
+        result = await processImage(filePath, options, progress);
+        processedFilePath = result.processedFilePath;
+
+        // Upload to Arweave
+        progress.report({ message: "Uploading to Arweave...", increment: 20 });
+        const uploadOptions: ArweaveUploadOptions = {
+          tags: getCustomTags(),
+          enableMetadataTags: getMetadataTagsEnabled(),
+          retryCount: getSetting("retryCount", 3),
+          retryDelay: getSetting("retryDelay", 1000),
+        };
+
+        uploadResult = await uploadToArweave(
+          wallet,
+          processedFilePath,
+          uploadOptions,
+          progress,
+          token
+        );
+
+        // Track stats
+        if (result && uploadResult) {
+          await trackUpload(
+            context,
+            path.basename(filePath),
+            result.originalSize,
+            result.processedSize,
+            uploadResult.cost.ar,
+            uploadResult.cost.usd || "0.00",
+            uploadResult.txId,
+            "image/webp"
+          );
+        }
+
+        if (uploadResult) {
+          return {
+            url: uploadResult.url,
+            fileName: fileName,
+          };
+        }
+        return null;
+      }
+    );
+
+    return processResult || null;
+  } catch (error) {
+    throw error;
+  } finally {
+    // Cleanup temporary processed file
+    if (
+      processedFilePath &&
+      processedFilePath !== filePath &&
+      fs.existsSync(processedFilePath)
+    ) {
+      try {
+        const preserveProcessed = getSetting("preserveProcessedImages", false);
+        if (!preserveProcessed) {
+          fs.unlinkSync(processedFilePath);
+        }
+      } catch (error) {
+        // Silent fail on cleanup
+      }
+    }
+  }
+}
