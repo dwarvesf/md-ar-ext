@@ -1,6 +1,6 @@
 {
   "name": "md-ar-ext",
-  "displayName": "md-ar-ext",
+  "displayName": "Markdown Arweave Uploader",
   "description": "A VS Code extension to upload resized WebP images to Arweave and insert Markdown links",
   "version": "0.2.0",
   "publisher": "dwarvesf",
@@ -132,7 +132,7 @@
       ]
     },
     "configuration": {
-      "title": "md-ar-ext",
+      "title": "Markdown Arweave Uploader",
       "properties": {
         "md-ar-ext.webpQuality": {
           "type": "number",

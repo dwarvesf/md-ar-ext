@@ -2,11 +2,9 @@
  * Test utilities for the extension
  */
 import * as sinon from 'sinon';
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import * as assert from 'assert';
 
 // Import the mocks
 import { mockVSCode, setupVSCodeMocks, resetVSCodeMocks } from './mocks/vscode';
