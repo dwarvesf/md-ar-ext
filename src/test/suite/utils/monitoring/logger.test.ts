@@ -52,7 +52,6 @@ suite('Logger Tests', () => {
     // Reset the singleton instance
     Logger['instance'] = undefined as any;
     
-    const instance = Logger.getInstance();
     
     assert.strictEqual(createOutputChannelStub.calledOnce, true);
     assert.strictEqual(createOutputChannelStub.firstCall.args[0], 'MD-AR-EXT');
@@ -63,7 +62,6 @@ suite('Logger Tests', () => {
     Logger['instance'] = undefined as any;
     
     const customName = 'CUSTOM-LOGGER';
-    const instance = Logger.getInstance(customName);
     
     assert.strictEqual(createOutputChannelStub.calledOnce, true);
     assert.strictEqual(createOutputChannelStub.firstCall.args[0], customName);

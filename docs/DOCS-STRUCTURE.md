@@ -16,6 +16,7 @@ The documentation has been reorganized into a simpler structure:
 ### README.md
 
 The main documentation file provides:
+
 - Complete overview of the extension
 - Core functionality descriptions
 - Implementation architecture summary
@@ -27,6 +28,7 @@ The main documentation file provides:
 ### PRODUCT-SPEC.md
 
 This document combines the product requirements and implementation details:
+
 - Product purpose and target users
 - Core functionality specifications
 - Implementation architecture
@@ -37,6 +39,7 @@ This document combines the product requirements and implementation details:
 ### TECH-GUIDE.md
 
 A comprehensive guide for developers:
+
 - Development environment setup
 - Project setup instructions
 - Dependencies and requirements
@@ -52,4 +55,4 @@ When updating documentation:
 1. Focus on keeping the three main documents (README.md, PRODUCT-SPEC.md, TECH-GUIDE.md) up-to-date
 2. Add new implementation details to PRODUCT-SPEC.md
 3. Add new development guidance to TECH-GUIDE.md
-4. Update this DOCS-STRUCTURE.md file if the organization changes 
+4. Update this DOCS-STRUCTURE.md file if the organization changes

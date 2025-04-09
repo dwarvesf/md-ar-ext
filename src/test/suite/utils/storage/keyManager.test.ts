@@ -3,8 +3,6 @@ import * as sinon from 'sinon';
 import * as keyManager from '../../../../utils/storage/keyManager';
 import * as vscode from 'vscode';
 import { TestUtils } from '../../utils/testUtils';
-import * as fs from 'fs';
-import * as path from 'path';
 
 suite('KeyManager Test Suite', () => {
   let sandbox: sinon.SinonSandbox;

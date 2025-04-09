@@ -1,12 +1,7 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { 
   openSettings,
   quickConfigureSettings,
   showSettingsUI,
-  getSetting,
-  updateSetting,
   exportSettings,
   importSettings
 } from '../utils/storage/settingsManager';

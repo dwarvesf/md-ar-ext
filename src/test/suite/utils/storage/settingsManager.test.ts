@@ -33,9 +33,6 @@ suite('SettingsManager Tests', () => {
   });
 
   test('getSetting should return the correct setting value', () => {
-    const configMock = getConfigurationStub.returns({
-      get: sinon.stub().returns('test-value')
-    });
     
     const value = getSetting('testKey', 'default-value');
     
@@ -45,9 +42,6 @@ suite('SettingsManager Tests', () => {
   });
 
   test('getSetting should return the default value if setting is not found', () => {
-    const configMock = getConfigurationStub.returns({
-      get: sinon.stub().returns(undefined)
-    });
     
     const value = getSetting('nonExistentKey', 'default-value');
     
@@ -58,9 +52,6 @@ suite('SettingsManager Tests', () => {
 
   test('updateSetting should update the setting value', async () => {
     const updateStub = sinon.stub().returns(Promise.resolve());
-    const configMock = getConfigurationStub.returns({
-      update: updateStub
-    });
     
     await updateSetting('testKey', 'new-value');
     
@@ -73,9 +64,6 @@ suite('SettingsManager Tests', () => {
 
   test('updateSetting should use specified configuration target', async () => {
     const updateStub = sinon.stub().returns(Promise.resolve());
-    const configMock = getConfigurationStub.returns({
-      update: updateStub
-    });
     
     await updateSetting('testKey', 'new-value', vscode.ConfigurationTarget.Global);
     

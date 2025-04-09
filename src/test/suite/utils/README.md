@@ -43,4 +43,4 @@ describe('My Test Suite', () => {
 ## Legacy Files
 
 There is a legacy JavaScript mock file in `out/test/mock-vscode.js` which is used by the `test:single` npm script.
-New tests should use the TypeScript implementation in this directory instead. 
+New tests should use the TypeScript implementation in this directory instead.

@@ -16,7 +16,6 @@ import {
   uploadToArweave, 
   createMarkdownLink, 
   checkBalanceSufficient,
-  estimateUploadCost,
   formatFileSize,
   verifyTransaction,
   ArweaveUploadOptions,
@@ -105,7 +104,7 @@ export async function handleUploadImage(context: vscode.ExtensionContext): Promi
  * Process an image file without uploading it
  * @param context Extension context
  */
-export async function processImageOnly(context: vscode.ExtensionContext): Promise<void> {
+export async function processImageOnly(_context: vscode.ExtensionContext): Promise<void> {
   // Show file picker to select image
   const fileUris = await vscode.window.showOpenDialog({
     canSelectMany: false,

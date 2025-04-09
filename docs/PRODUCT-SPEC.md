@@ -9,6 +9,7 @@ This document combines the Product Requirements and Implementation details for t
 The md-ar-ext VS Code extension provides tools for optimizing, uploading, and embedding images in Markdown files using the Arweave blockchain for permanent storage.
 
 **Target Users:**
+
 - Technical writers and documentation authors
 - Markdown content creators and bloggers
 - Developers documenting code or writing technical articles
@@ -87,16 +88,19 @@ src/
 #### 2.2.1. Completed Modules and Features
 
 **Code Structure Refactoring:**
+
 - ✅ Modular architecture with clear separation of concerns
 - ✅ Enhanced directory structure for better organization
 - ✅ Lightweight extension.ts for command wiring
 
 **Infrastructure Modules:**
+
 - ✅ Comprehensive error handling system with typed errors
 - ✅ Robust logging system with categories and levels
 - ✅ Resilient network service with retry logic
 
 **Core Functionality:**
+
 - ✅ Enhanced image processing with detailed results
 - ✅ Transaction verification with confirmation status
 - ✅ Improved wallet key management and validation
@@ -106,12 +110,14 @@ src/
 #### 2.2.2. In Progress and Remaining Tasks
 
 **Testing:**
+
 - 🔄 Expanding unit tests coverage for all modules (40% complete)
 - 🔄 Implementing integration tests for command workflows (20% complete)
 - 🔄 End-to-end tests for user workflows
 - 🔄 Cross-platform testing
 
 **Documentation:**
+
 - 🔄 User documentation
 - 🔄 Developer documentation
 - 🔄 Code comments and API documentation
@@ -121,11 +127,13 @@ src/
 #### 2.3.1. Phase 1: Core Module Improvements (Completed)
 
 **Objectives:**
+
 - Enhanced existing modules with better error handling and feedback
 - Improved code organization and maintainability
 - Added new core functionality to existing modules
 
 **Key Tasks:**
+
 1. ✅ Refactored codebase to modular architecture
 2. ✅ Enhanced ImageProcessor with better options and results
 3. ✅ Updated ArweaveUploader with transaction verification
@@ -136,11 +144,13 @@ src/
 #### 2.3.2. Phase 2: Architecture and Testing (In Progress)
 
 **Objectives:**
+
 - Improve overall architecture with better infrastructure
 - Implement comprehensive testing strategy
 - Add new features for user experience enhancement
 
 **Key Tasks:**
+
 1. ✅ Added centralized error handling system
 2. ✅ Added structured logging system
 3. ✅ Implemented robust network service with retries
@@ -151,11 +161,13 @@ src/
 #### 2.3.3. Phase 3: Documentation and Refinement (Planned)
 
 **Objectives:**
+
 - Complete documentation for users and developers
 - Refine user interface and experience
 - Optimize performance and reliability
 
 **Key Tasks:**
+
 1. 🔄 User documentation with examples
 2. 🔄 Developer documentation for extension architecture
 3. 🔄 Code comments and API documentation
@@ -211,4 +223,4 @@ The following features are planned for future versions:
 - Statistics dashboard with charts and graphs
 - Integration with additional Markdown publishing platforms
 - Enhanced metadata tagging with AI-assisted suggestions
-- Extended file format support for specialized use cases 
+- Extended file format support for specialized use cases

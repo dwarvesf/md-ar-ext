@@ -5,7 +5,6 @@ This document provides comprehensive information for developers working on the m
 ## Table of Contents
 
 - [Development Requirements](#development-requirements)
-- [Project Setup](#project-setup)
 - [Dependencies](#dependencies)
 - [Testing Architecture](#testing-architecture)
 - [Test Plan](#test-plan)
@@ -25,22 +24,26 @@ To develop the md-ar-ext extension, you'll need:
 ### IDE Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/md-ar-ext.git
    cd md-ar-ext
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Open the project in VS Code:
+
    ```bash
    code .
    ```
 
 4. Start the development server:
+
    ```bash
    npm run watch
    ```
@@ -58,6 +61,7 @@ To develop the md-ar-ext extension, you'll need:
 **Required Version:** 7.0.0 or higher
 
 **Installation:**
+
 - **macOS:** `brew install imagemagick`
 - **Windows:** Download installer from [ImageMagick website](https://imagemagick.org/script/download.php)
 - **Linux (Debian/Ubuntu):** `sudo apt-get install imagemagick`
@@ -66,6 +70,7 @@ To develop the md-ar-ext extension, you'll need:
 **Verification Command:** `magick --version` or `convert --version`
 
 **Features Used:**
+
 - Format conversion to WebP
 - Image resizing
 - Quality adjustment
@@ -78,6 +83,7 @@ To develop the md-ar-ext extension, you'll need:
 **Required Version:** 14.0.0 or higher
 
 **Installation:**
+
 - Download from [Node.js website](https://nodejs.org/)
 - Or use a version manager like nvm
 
@@ -349,4 +355,4 @@ The following improvements have been made to the VS Code testing environment:
    - Never store sensitive data in plain text
    - Use SecretStorage for sensitive information
    - Validate all user inputs
-   - Implement proper permissions handling 
+   - Implement proper permissions handling

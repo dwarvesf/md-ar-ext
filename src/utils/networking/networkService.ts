@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import fetch, { Response } from 'node-fetch';
 import { logger } from '../monitoring/logger';
 import { ExtensionError, ErrorType, createNetworkError } from '../monitoring/errorHandler';

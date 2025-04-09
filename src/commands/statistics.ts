@@ -1,12 +1,8 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { 
   displayStats, 
   exportStats,
-  updatePendingTransactions,
-  updateTransactionStatus
-} from '../utils/monitoring/statsTracker';
+  updatePendingTransactions} from '../utils/monitoring/statsTracker';
 
 /**
  * Command handler for displaying statistics

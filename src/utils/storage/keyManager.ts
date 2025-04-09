@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import { arweave, getWalletAddress } from '../processing/arweaveUploader';
+import { getWalletAddress } from '../processing/arweaveUploader';
 
 const ARWEAVE_KEY_SECRET = 'arweavePrivateKey';
 

@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as mocha from 'mocha';
 import * as sinon from 'sinon';
-import * as vscode from 'vscode';
 import { networkService } from '../../../../utils/networking/networkService';
 import * as arweaveUploader from '../../../../utils/processing/arweaveUploader';
 import { ExtensionError, ErrorType } from '../../../../utils/monitoring/errorHandler';

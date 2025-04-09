@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import * as child_process from 'child_process';
 import * as os from 'os';
 import * as settingsManager from '../storage/settingsManager';
-import * as crypto from 'crypto';
 
 // Export interfaces for use in other modules
 export interface ImageProcessOptions {

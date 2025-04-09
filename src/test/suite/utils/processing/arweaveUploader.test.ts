@@ -1,7 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as arweaveUploader from '../../../../utils/processing/arweaveUploader';
 import { TestUtils } from '../../utils/testUtils';
 import { ExtensionError, ErrorType } from '../../../../utils/monitoring/errorHandler';

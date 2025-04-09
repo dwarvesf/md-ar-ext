@@ -1,14 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
 
 /**
  * WebView panel types
  */
 export enum WebViewType {
   Settings = 'md-ar-ext.settingsView',
-  Statistics = 'md-ar-ext.statisticsView',
-  CostEstimation = 'md-ar-ext.costEstimationView'
+  Statistics = 'md-ar-ext.statisticsView'
 }
 
 /**

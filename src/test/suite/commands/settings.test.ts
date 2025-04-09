@@ -1,6 +1,5 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as vscode from 'vscode';
 import * as settings from '../../../commands/settings';
 import * as settingsManager from '../../../utils/storage/settingsManager';
 import { TestUtils } from '../utils/testUtils';

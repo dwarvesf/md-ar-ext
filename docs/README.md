@@ -45,4 +45,4 @@ When updating documentation:
 
 1. Keep the main documents up-to-date with the latest implementation
 2. Maintain consistent formatting across all documentation files
-3. Update this index when adding new documentation files 
+3. Update this index when adding new documentation files

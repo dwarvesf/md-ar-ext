@@ -1,10 +1,9 @@
 import Arweave from 'arweave';
 import * as fs from 'fs';
-import * as settingsManager from '../storage/settingsManager';
 import * as vscode from 'vscode';
 import { networkService } from '../networking/networkService';
 import { logger } from '../monitoring/logger';
-import { ExtensionError, ErrorType, createNetworkError, handleError } from '../monitoring/errorHandler';
+import { ExtensionError, ErrorType, createNetworkError } from '../monitoring/errorHandler';
 
 // Define interfaces for the module
 export interface ArweaveUploadOptions {
