@@ -40,6 +40,13 @@ async function main(): Promise<void> {
       console.log('Debug flags enabled (review if needed for vscode-test).');
     }
 
+    // Add flags commonly needed for CI environments like GitHub Actions
+    if (process.env.CI) {
+      console.log('CI environment detected, adding --disable-gpu and --no-sandbox flags.');
+      launchArgs.push('--disable-gpu');
+      launchArgs.push('--no-sandbox');
+    }
+
     console.log('Starting VS Code test runner...');
     console.log(`Extension path: ${extensionDevelopmentPath}`);
     console.log(`Test path: ${extensionTestsPath}`);
