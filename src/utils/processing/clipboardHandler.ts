@@ -1,8 +1,7 @@
-import * as child_process from "child_process";
-import * as os from "os";
-import * as path from "path";
-import * as fs from "fs";
-import * as vscode from "vscode";
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 /**
  * Gets image data from the clipboard using platform-specific methods
@@ -11,17 +10,17 @@ import * as vscode from "vscode";
 export async function getImageFromClipboard(): Promise<Buffer | null> {
   try {
     switch (process.platform) {
-      case "darwin":
+      case 'darwin':
         return await getMacOSClipboardImage();
-      case "win32":
+      case 'win32':
         return await getWindowsClipboardImage();
-      case "linux":
+      case 'linux':
         return await getLinuxClipboardImage();
       default:
         throw new Error(`Unsupported platform: ${process.platform}`);
     }
   } catch (error) {
-    console.error("Failed to get image from clipboard:", error);
+    console.error('Failed to get image from clipboard:', error);
     return null;
   }
 }
@@ -34,9 +33,9 @@ async function getMacOSClipboardImage(): Promise<Buffer | null> {
 
   try {
     // AppleScript to check if clipboard contains image
-    const hasImageCmd = `osascript -e 'clipboard info' | grep "«class PNGf»"`;
+    const hasImageCmd = 'osascript -e \'clipboard info\' | grep "«class PNGf»"';
     try {
-      child_process.execSync(hasImageCmd);
+      childProcess.execSync(hasImageCmd);
     } catch (error) {
       // If grep fails, there's no image in clipboard
       return null;
@@ -48,7 +47,7 @@ async function getMacOSClipboardImage(): Promise<Buffer | null> {
             close access "${tempFile}"
         end try'`;
 
-    child_process.execSync(script);
+    childProcess.execSync(script);
 
     if (fs.existsSync(tempFile)) {
       const buffer = fs.readFileSync(tempFile);
@@ -88,7 +87,7 @@ async function getWindowsClipboardImage(): Promise<Buffer | null> {
     fs.writeFileSync(psScript, script);
 
     try {
-      child_process.execSync(
+      childProcess.execSync(
         `powershell -ExecutionPolicy Bypass -File "${psScript}"`
       );
       if (fs.existsSync(tempFile)) {
@@ -104,7 +103,7 @@ async function getWindowsClipboardImage(): Promise<Buffer | null> {
       }
     }
   } catch (error) {
-    console.error("Failed to get image from Windows clipboard:", error);
+    console.error('Failed to get image from Windows clipboard:', error);
   }
 
   return null;
@@ -117,28 +116,28 @@ async function getLinuxClipboardImage(): Promise<Buffer | null> {
   try {
     // Check if xclip is installed
     try {
-      child_process.execSync("which xclip");
+      childProcess.execSync('which xclip');
     } catch (error) {
       throw new Error(
-        "xclip is not installed. Please install it using your package manager (e.g., sudo apt-get install xclip)"
+        'xclip is not installed. Please install it using your package manager (e.g., sudo apt-get install xclip)'
       );
     }
 
     // Check if clipboard has image data
-    const hasImage = child_process
-      .execSync("xclip -selection clipboard -t TARGETS")
+    const hasImage = childProcess
+      .execSync('xclip -selection clipboard -t TARGETS')
       .toString();
-    if (!hasImage.includes("image/png")) {
+    if (!hasImage.includes('image/png')) {
       return null;
     }
 
     // Get image data
-    const imageData = child_process.execSync(
-      "xclip -selection clipboard -t image/png -o"
+    const imageData = childProcess.execSync(
+      'xclip -selection clipboard -t image/png -o'
     );
     return Buffer.from(imageData);
   } catch (error) {
-    console.error("Failed to get image from Linux clipboard:", error);
+    console.error('Failed to get image from Linux clipboard:', error);
     return null;
   }
 }

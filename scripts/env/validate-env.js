@@ -22,8 +22,8 @@ const ENV_PATH = path.join(ROOT_DIR, '.env');
 const TEMPLATE_PATH = path.join(__dirname, '.env.template');
 
 // Required and optional variables categories
-const REQUIRED_VARS = ['VSCE_PAT'];
-const OPTIONAL_VARS = ['AR_GATEWAY_URL', 'DEV_MODE', 'TEST_MODE'];
+const REQUIRED_VARS = [];
+const OPTIONAL_VARS = ['VSCE_PAT', 'AR_GATEWAY_URL', 'DEV_MODE', 'TEST_MODE'];
 
 // Colors for terminal output
 const colors = {
@@ -166,4 +166,4 @@ function main() {
 }
 
 // Run the script
-main(); 
+main();

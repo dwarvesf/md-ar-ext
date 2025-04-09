@@ -1,8 +1,8 @@
-import * as vscode from "vscode";
-import * as path from "path";
+import * as vscode from 'vscode';
+import * as path from 'path';
 
 // Logger
-import { logger, LogLevel } from "./utils/monitoring/logger";
+import { logger, LogLevel } from './utils/monitoring/logger';
 
 // Command handlers
 import {
@@ -11,7 +11,7 @@ import {
   processImageOnly,
   checkImageMagickInstallation,
   handleDropImage,
-} from "./commands/image";
+} from './commands/image';
 
 import {
   handleUpdatePrivateKey,
@@ -20,7 +20,7 @@ import {
   handleShowWalletAddress,
   handleCheckBalance,
   handleWalletHistory,
-} from "./commands/wallet";
+} from './commands/wallet';
 
 import {
   handleOpenSettings,
@@ -28,24 +28,24 @@ import {
   handleShowSettingsUI,
   handleExportSettings,
   handleImportSettings,
-} from "./commands/settings";
+} from './commands/settings';
 
 import {
   handleDisplayStats,
   handleExportStats,
   handleVerifyTransactions,
-} from "./commands/statistics";
+} from './commands/statistics';
 
 // Utils
-import { checkImageMagickInstalled } from "./utils/processing/imageProcessor";
+import { checkImageMagickInstalled } from './utils/processing/imageProcessor';
 import {
   handleError,
   ExtensionError,
   ErrorType,
-} from "./utils/monitoring/errorHandler";
+} from './utils/monitoring/errorHandler';
 
 // Extend the Clipboard interface to include readImage
-declare module "vscode" {
+declare module 'vscode' {
   export interface Clipboard {
     readImage(): Thenable<Uint8Array>;
   }
@@ -73,7 +73,7 @@ export async function activate(
   context: vscode.ExtensionContext
 ): Promise<void> {
   try {
-    logger.info("Activating md-ar-ext extension...", "EXTENSION");
+    logger.info('Activating md-ar-ext extension...', 'EXTENSION');
 
     // Initialize extension state
     extensionState.debugMode =
@@ -82,79 +82,79 @@ export async function activate(
     // Set appropriate log level based on mode
     if (extensionState.debugMode) {
       logger.logLevel = LogLevel.debug;
-      logger.debug("Debug mode enabled", "EXTENSION");
+      logger.debug('Debug mode enabled', 'EXTENSION');
     }
 
     // Register image commands
-    registerCommand(context, "md-ar-ext.pasteAndInsert", () =>
+    registerCommand(context, 'md-ar-ext.pasteAndInsert', () =>
       handlePasteImage(context)
     );
-    registerCommand(context, "md-ar-ext.uploadAndInsert", () =>
+    registerCommand(context, 'md-ar-ext.uploadAndInsert', () =>
       handleUploadImage(context)
     );
-    registerCommand(context, "md-ar-ext.processImage", () =>
+    registerCommand(context, 'md-ar-ext.processImage', () =>
       processImageOnly(context)
     );
-    registerCommand(context, "md-ar-ext.checkImageMagick", () =>
+    registerCommand(context, 'md-ar-ext.checkImageMagick', () =>
       checkImageMagickInstallation()
     );
 
     // Register wallet commands
-    registerCommand(context, "md-ar-ext.updatePrivateKey", () =>
+    registerCommand(context, 'md-ar-ext.updatePrivateKey', () =>
       handleUpdatePrivateKey(context)
     );
-    registerCommand(context, "md-ar-ext.deletePrivateKey", () =>
+    registerCommand(context, 'md-ar-ext.deletePrivateKey', () =>
       handleDeletePrivateKey(context)
     );
-    registerCommand(context, "md-ar-ext.importKeyFromFile", () =>
+    registerCommand(context, 'md-ar-ext.importKeyFromFile', () =>
       handleImportKeyFromFile(context)
     );
-    registerCommand(context, "md-ar-ext.showWalletAddress", () =>
+    registerCommand(context, 'md-ar-ext.showWalletAddress', () =>
       handleShowWalletAddress(context)
     );
-    registerCommand(context, "md-ar-ext.checkBalance", () =>
+    registerCommand(context, 'md-ar-ext.checkBalance', () =>
       handleCheckBalance(context)
     );
-    registerCommand(context, "md-ar-ext.walletHistory", () =>
+    registerCommand(context, 'md-ar-ext.walletHistory', () =>
       handleWalletHistory(context)
     );
 
     // Register settings commands
-    registerCommand(context, "md-ar-ext.openSettings", () =>
+    registerCommand(context, 'md-ar-ext.openSettings', () =>
       handleOpenSettings()
     );
-    registerCommand(context, "md-ar-ext.configureSettings", () =>
+    registerCommand(context, 'md-ar-ext.configureSettings', () =>
       handleQuickConfigureSettings()
     );
-    registerCommand(context, "md-ar-ext.showSettingsUI", () =>
+    registerCommand(context, 'md-ar-ext.showSettingsUI', () =>
       handleShowSettingsUI()
     );
-    registerCommand(context, "md-ar-ext.exportSettings", () =>
+    registerCommand(context, 'md-ar-ext.exportSettings', () =>
       handleExportSettings()
     );
-    registerCommand(context, "md-ar-ext.importSettings", () =>
+    registerCommand(context, 'md-ar-ext.importSettings', () =>
       handleImportSettings()
     );
 
     // Register statistics commands
-    registerCommand(context, "md-ar-ext.viewStatistics", () =>
+    registerCommand(context, 'md-ar-ext.viewStatistics', () =>
       handleDisplayStats(context)
     );
-    registerCommand(context, "md-ar-ext.exportStats", () =>
+    registerCommand(context, 'md-ar-ext.exportStats', () =>
       handleExportStats(context)
     );
-    registerCommand(context, "md-ar-ext.verifyTransactions", () =>
+    registerCommand(context, 'md-ar-ext.verifyTransactions', () =>
       handleVerifyTransactions(context)
     );
 
     // Register clipboard handler for paste events
     context.subscriptions.push(
       vscode.commands.registerTextEditorCommand(
-        "md-ar-ext.handlePaste",
+        'md-ar-ext.handlePaste',
         async (editor) => {
           try {
             // Only handle paste in markdown documents
-            if (editor.document.languageId !== "markdown") {
+            if (editor.document.languageId !== 'markdown') {
               return;
             }
 
@@ -170,7 +170,7 @@ export async function activate(
     context.subscriptions.push(
       vscode.workspace.onDidCreateFiles(async (e) => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor || editor.document.languageId !== "markdown") {
+        if (!editor || editor.document.languageId !== 'markdown') {
           return;
         }
 
@@ -178,12 +178,12 @@ export async function activate(
         for (const file of e.files) {
           const ext = path.extname(file.fsPath).toLowerCase();
           const validExtensions = [
-            ".png",
-            ".jpg",
-            ".jpeg",
-            ".gif",
-            ".webp",
-            ".avif",
+            '.png',
+            '.jpg',
+            '.jpeg',
+            '.gif',
+            '.webp',
+            '.avif',
           ];
 
           if (validExtensions.includes(ext)) {
@@ -199,39 +199,39 @@ export async function activate(
 
     // Verify ImageMagick is installed at startup
     const checkDependencies = vscode.workspace
-      .getConfiguration("md-ar-ext")
-      .get("autoCheckDependencies", true);
+      .getConfiguration('md-ar-ext')
+      .get('autoCheckDependencies', true);
 
     if (checkDependencies) {
-      logger.debug("Checking ImageMagick installation...", "EXTENSION");
+      logger.debug('Checking ImageMagick installation...', 'EXTENSION');
 
       const installed = await checkImageMagickInstalled();
       if (!installed) {
         const error = new ExtensionError(
-          "ImageMagick is required but does not appear to be installed.",
+          'ImageMagick is required but does not appear to be installed.',
           ErrorType.dependency,
           undefined,
           true,
-          "Show Installation Instructions",
+          'Show Installation Instructions',
           () => checkImageMagickInstallation()
         );
         await handleError(error, logger.channel);
       } else {
-        logger.info("ImageMagick is installed.", "EXTENSION");
+        logger.info('ImageMagick is installed.', 'EXTENSION');
       }
     }
 
     // Mark as initialized
     extensionState.initialized = true;
-    logger.info("md-ar-ext extension activated successfully.", "EXTENSION");
+    logger.info('md-ar-ext extension activated successfully.', 'EXTENSION');
   } catch (error) {
-    logger.error("Failed to activate extension:", error, "EXTENSION");
+    logger.error('Failed to activate extension:', error, 'EXTENSION');
 
     // Show error notification
     await handleError(
       error,
       logger.channel,
-      "Failed to activate md-ar-ext extension. See output panel for details."
+      'Failed to activate md-ar-ext extension. See output panel for details.'
     );
   }
 }
@@ -240,7 +240,7 @@ export async function activate(
  * Deactivate the extension
  */
 export function deactivate(): void {
-  logger.info("md-ar-ext extension deactivated.", "EXTENSION");
+  logger.info('md-ar-ext extension deactivated.', 'EXTENSION');
 
   // Clean up resources
   logger.dispose();
@@ -259,10 +259,10 @@ function registerCommand(
 ): void {
   const wrappedCallback = async (...args: any[]) => {
     try {
-      logger.debug(`Executing command: ${command}`, "COMMAND");
+      logger.debug(`Executing command: ${command}`, 'COMMAND');
       return await callback(...args);
     } catch (error) {
-      logger.error(`Error executing command ${command}:`, error, "COMMAND");
+      logger.error(`Error executing command ${command}:`, error, 'COMMAND');
       await handleError(error, logger.channel);
       return undefined;
     }
@@ -270,5 +270,5 @@ function registerCommand(
 
   const disposable = vscode.commands.registerCommand(command, wrappedCallback);
   context.subscriptions.push(disposable);
-  logger.debug(`Registered command: ${command}`, "EXTENSION");
+  logger.debug(`Registered command: ${command}`, 'EXTENSION');
 }
